@@ -1,0 +1,29 @@
+{
+  "name": "civi-react-events",
+  "version": "0.0.1",
+  "description": "Displays CiviCRM events in WordPress using React",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "wp-scripts build",
+    "start": "wp-scripts start"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/prdufresne/civi-react-events.git"
+  },
+  "keywords": [
+    "wordpress",
+    "CiviCRM",
+    "event"
+  ],
+  "author": "Paul Dufresne",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/prdufresne/civi-react-events/issues"
+  },
+  "homepage": "https://github.com/prdufresne/civi-react-events#readme",
+  "devDependencies": {
+    "@wordpress/scripts": "^25.3.0"
+  }
+}
