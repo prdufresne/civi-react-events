@@ -40,5 +40,6 @@ add_action( 'admin_enqueue_scripts', 'civi_react_events_admin_enqueue_scripts' )
  */
 function civi_react_events_admin_enqueue_scripts() {
     wp_enqueue_style( 'civi_react_events-style', plugin_dir_url( __FILE__ ) . 'build/index.css' );
+    wp_enqueue_style( 'react-bootstrap-style', plugin_dir_url( __FILE__ ) . 'node_modules/bootstrap/dist/css/bootstrap.min.css' );
     wp_enqueue_script( 'civi_react_events-script', plugin_dir_url( __FILE__ ) . 'build/index.js', array( 'wp-element' ), '1.0.0', true );
 }
