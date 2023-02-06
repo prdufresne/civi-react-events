@@ -22,24 +22,59 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-// import Dashboard from './components/Dashboard';
+class App extends (react__WEBPACK_IMPORTED_MODULE_1___default().Component) {
+  constructor(props) {
+    super(props);
+    this.state = {
+      title: "Civi React Calendar",
+      events: []
+    };
+  }
+  componentDidMount() {
+    this.loadData();
+  }
+  loadData() {
+    const events = this.fetchEvents().then(events => {
+      this.setState({
+        events
+      });
+    });
+  }
+  fetchEvents = () => {
+    return new Promise((resolve, reject) => {
+      const queryParameters = {
+        'action': 'civi_react_events',
+        'request': 'event-list',
+        'data': `This is data passed to the backed`
+      };
+      jQuery.post(my_ajax_object.ajax_url, queryParameters, function (response) {
+        console.log('Got this from the server: ', response);
+        return resolve(JSON.parse(response));
+        // },
+        // function (err) {
+        //     return reject(err);
+      });
+    });
+  };
 
-const App = () => {
-  const title = "Civi React Calendar";
-  const eventList = JSON.parse(document.getElementById('eventList').innerText);
-  console.log(eventList);
-  return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(react_bootstrap__WEBPACK_IMPORTED_MODULE_2__["default"], null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("h2", {
-    className: "app-title"
-  }, title), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("hr", null), eventList.map((event, index) => {
-    return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(react_bootstrap__WEBPACK_IMPORTED_MODULE_3__["default"], {
-      index: index
-    }, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(react_bootstrap__WEBPACK_IMPORTED_MODULE_4__["default"], {
-      md: 2
-    }, event.start_date), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(react_bootstrap__WEBPACK_IMPORTED_MODULE_4__["default"], {
-      md: 10
-    }, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("h2", null, event.title), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("p", null, event.summary)));
-  }));
-};
+  render() {
+    const {
+      title,
+      events
+    } = this.state;
+    return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(react_bootstrap__WEBPACK_IMPORTED_MODULE_2__["default"], null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("h2", {
+      className: "app-title"
+    }, title), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("hr", null), events.map((event, index) => {
+      return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(react_bootstrap__WEBPACK_IMPORTED_MODULE_3__["default"], {
+        index: index
+      }, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(react_bootstrap__WEBPACK_IMPORTED_MODULE_4__["default"], {
+        md: 2
+      }, event.start_date), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(react_bootstrap__WEBPACK_IMPORTED_MODULE_4__["default"], {
+        md: 10
+      }, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("h2", null, event.title), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("p", null, event.summary)));
+    }));
+  }
+}
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (App);
 
 /***/ }),

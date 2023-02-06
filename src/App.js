@@ -1,19 +1,63 @@
 import React from 'react';
-import {Container, Row, Col} from 'react-bootstrap';
-// import Dashboard from './components/Dashboard';
+import { Container, Row, Col } from 'react-bootstrap';
 
-const App = () => {
 
-    const title="Civi React Calendar"
-    const eventList = JSON.parse(document.getElementById('eventList').innerText);
-    console.log(eventList);
+class App extends React.Component {
 
-    return (
-        <Container>
-            <h2 className='app-title'>{title}</h2>
-            <hr />
-            
-            {eventList.map((event, index) => {
+    constructor(props) {
+        super(props);
+        this.state = { 
+            title: "Civi React Calendar",
+            events: [],
+         };
+    }
+
+    componentDidMount() {
+        this.loadData();
+    }
+
+    loadData() {
+        const events = this.fetchEvents()
+            .then((events) => {
+                this.setState({
+                    events,
+                })
+            });
+
+    }
+
+    fetchEvents = () => {
+
+        return new Promise((resolve, reject) => {
+            const queryParameters = {
+                'action': 'civi_react_events',
+                'request': 'event-list',
+                'data': `This is data passed to the backed`,
+            };
+
+            jQuery.post(my_ajax_object.ajax_url, queryParameters,
+                function (response) {
+                    console.log('Got this from the server: ', response);
+                    return resolve(JSON.parse(response));
+                // },
+                // function (err) {
+                //     return reject(err);
+                }
+            );
+        })
+
+    }
+
+    render() {
+
+        const { title, events } = this.state;
+
+        return (
+            <Container>
+                <h2 className='app-title'>{title}</h2>
+                <hr />
+
+                {events.map((event, index) => {
                 return (
                     <Row index={index}>
                         <Col md={2}>
@@ -26,8 +70,8 @@ const App = () => {
                     </Row>
                 )
             })}
-        </Container>
-     );
+            </Container>
+        );
+    }
 }
-
 export default App; 
