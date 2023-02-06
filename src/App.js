@@ -2,6 +2,24 @@ import React from 'react';
 import { Container, Row, Col } from 'react-bootstrap';
 
 
+function Calendar(props) {
+    const weekday = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+    const startParts = props.start.split(" ");
+    const endParts = props.end.split(" ");
+    const startDate = Date.parse(startParts[0]);
+    const endDate = Date.parse(endParts[0]);
+
+    const startWeekay = startDate.getDay();
+    const endWeekday = endDate.getDay();
+
+    return (
+        <div class="civi-event-calendar-cell-date">
+            <div class="civi-event-calendar-weekday">{startWeekay}</div>
+            <div class="civi-event-calendar-day multiday">{startDate.getDate()}</div>
+        </div>
+    )
+}
+
 class App extends React.Component {
 
     constructor(props) {
@@ -37,7 +55,6 @@ class App extends React.Component {
 
             jQuery.post(my_ajax_object.ajax_url, queryParameters,
                 function (response) {
-                    console.log('Got this from the server: ', response);
                     return resolve(JSON.parse(response));
                 // },
                 // function (err) {
@@ -52,13 +69,18 @@ class App extends React.Component {
 
         const { title, events } = this.state;
 
+        console.log("Events List:", events);
+
         return (
             <Container>
                 {events.map((event, index) => {
                 return (
                     <Row index={index}>
                         <Col md={2}>
-                            {event.start_date}
+                            <Calendar
+                                start={event.start_date}
+                                end={event.end_date}
+                            />
                         </Col>
                         <Col md={10}>
                             <h2>{event.title}</h2>

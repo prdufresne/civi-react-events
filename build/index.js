@@ -22,6 +22,22 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
+function Calendar(props) {
+  const weekday = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+  const startParts = props.start.split(" ");
+  const endParts = props.end.split(" ");
+  const startDate = Date.parse(startParts[0]);
+  const endDate = Date.parse(endParts[0]);
+  const startWeekay = startDate.getDay();
+  const endWeekday = endDate.getDay();
+  return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", {
+    class: "civi-event-calendar-cell-date"
+  }, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", {
+    class: "civi-event-calendar-weekday"
+  }, startWeekay), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", {
+    class: "civi-event-calendar-day multiday"
+  }, startDate.getDate()));
+}
 class App extends (react__WEBPACK_IMPORTED_MODULE_1___default().Component) {
   constructor(props) {
     super(props);
@@ -48,7 +64,6 @@ class App extends (react__WEBPACK_IMPORTED_MODULE_1___default().Component) {
         'data': `This is data passed to the backed`
       };
       jQuery.post(my_ajax_object.ajax_url, queryParameters, function (response) {
-        console.log('Got this from the server: ', response);
         return resolve(JSON.parse(response));
         // },
         // function (err) {
@@ -62,14 +77,16 @@ class App extends (react__WEBPACK_IMPORTED_MODULE_1___default().Component) {
       title,
       events
     } = this.state;
-    return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(react_bootstrap__WEBPACK_IMPORTED_MODULE_2__["default"], null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("h2", {
-      className: "app-title"
-    }, title), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("hr", null), events.map((event, index) => {
+    console.log("Events List:", events);
+    return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(react_bootstrap__WEBPACK_IMPORTED_MODULE_2__["default"], null, events.map((event, index) => {
       return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(react_bootstrap__WEBPACK_IMPORTED_MODULE_3__["default"], {
         index: index
       }, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(react_bootstrap__WEBPACK_IMPORTED_MODULE_4__["default"], {
         md: 2
-      }, event.start_date), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(react_bootstrap__WEBPACK_IMPORTED_MODULE_4__["default"], {
+      }, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(Calendar, {
+        start: event.start_date,
+        end: event.end_date
+      })), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(react_bootstrap__WEBPACK_IMPORTED_MODULE_4__["default"], {
         md: 10
       }, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("h2", null, event.title), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("p", null, event.summary)));
     }));
@@ -1901,16 +1918,14 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _App__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./App */ "./src/App.js");
 /* harmony import */ var _style_main_scss__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./style/main.scss */ "./src/style/main.scss");
 
+// Render the App component into the DOM if it exists
+const civiReactEvents = document.getElementById('civi-react-events');
 
 
 
-/**
- * Import the stylesheet for the plugin.
- */
-
-
-// Render the App component into the DOM
-(0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.render)((0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_App__WEBPACK_IMPORTED_MODULE_1__["default"], null), document.getElementById('civi-react-events'));
+if (civiReactEvents) {
+  (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.render)((0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_App__WEBPACK_IMPORTED_MODULE_1__["default"], null), civiReactEvents);
+}
 })();
 
 /******/ })()

@@ -2,3 +2,42 @@
 .civi-react-events {
     display: flex;
 }
+
+.civi-react-events-cell-date {
+    display: block;
+    float: left;
+    width: 4em;
+    margin: 5px 5px;
+    border-radius: 10px;
+    box-shadow: 3px 3px #aaa;
+    margin-right: 10px;
+  }
+
+  .civi-react-events-weekday {
+    text-align: center;
+    font-size: .8em;
+    font-family: Arial, Helvetica, sans-serif;
+    background-color: #555;
+    color: #fff;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    padding-top: 2px;
+  }
+  
+  .civi-react-events-day {
+    text-align: center;
+    line-height: 1em;
+    font-size: 2em;
+    font-family: Arial, Helvetica, sans-serif;
+    background-color: #FFFFFF;
+    border-bottom-left-radius:  10px;
+    border-bottom-right-radius: 10px;
+    padding-top: 3px;
+    padding-bottom: 3px;
+  }
+
+  .civi-react-events-day.multiday {
+    font-size: 1.25em;
+    line-height: 1.6em;
+    font-weight: bold;
+  }
