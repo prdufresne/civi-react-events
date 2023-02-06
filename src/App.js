@@ -54,9 +54,6 @@ class App extends React.Component {
 
         return (
             <Container>
-                <h2 className='app-title'>{title}</h2>
-                <hr />
-
                 {events.map((event, index) => {
                 return (
                     <Row index={index}>

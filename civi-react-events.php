@@ -61,7 +61,7 @@ function event_list() {
 function render_shortcode() {
 
     $Content = <<<CONTENT
-        <div id="civi-react-events">
+        <div class="civi-react-events" id="civi-react-events">
             <h3>Loading...</h3>
         <div>
     CONTENT;
