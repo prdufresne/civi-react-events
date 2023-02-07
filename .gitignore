@@ -1,5 +1,5 @@
 node_modules
-buiid/*
+buiid
 build/index.asset.php
 build/index.css
 build/index.css.map
