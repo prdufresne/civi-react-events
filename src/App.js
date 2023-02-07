@@ -6,16 +6,26 @@ function Calendar(props) {
     const weekday = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
     const startParts = props.start.split(" ");
     const endParts = props.end.split(" ");
-    const startDate = Date.parse(startParts[0]);
-    const endDate = Date.parse(endParts[0]);
+    const startDate = new Date(startParts[0]);
+    const endDate = new Date(endParts[0]);
 
-    const startWeekay = startDate.getDay();
+    const startWeekday = startDate.getDay();
     const endWeekday = endDate.getDay();
+
+    let weekdayString = weekday[startWeekday];
+    let dayString = startDate.getDate();
+    let style = "";
+
+    if(startParts[0] != endParts[0]) {
+        weekdayString = `${weekday[startWeekday].substring(0,3)}-${weekday[endWeekday].substring(0,3)}`
+        dayString += `-${endDate.getDate()}`;
+        style = " multiday";
+    }
 
     return (
         <div class="civi-event-calendar-cell-date">
-            <div class="civi-event-calendar-weekday">{startWeekay}</div>
-            <div class="civi-event-calendar-day multiday">{startDate.getDate()}</div>
+            <div class="civi-event-calendar-weekday">{weekdayString}</div>
+            <div class={"civi-event-calendar-day" + style}>{dayString}</div>
         </div>
     )
 }
