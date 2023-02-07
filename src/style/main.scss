@@ -1,6 +1,21 @@
 
 .civi-react-events {
     display: flex;
+    padding-bottom: 20px;
+}
+
+.civi-react-events-event {
+  display: inline-block;
+  background-color: #F1F2F3;
+  width: 100%;
+  clear: both;
+  margin-bottom: 5px;
+  align-content: center;
+  padding-top: 2px;
+  padding-bottom: 5px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom: solid 5px #555;
 }
 
 .civi-react-events-cell-date {
@@ -40,4 +55,21 @@
     font-size: 1.25em;
     line-height: 1.6em;
     font-weight: bold;
+  }
+
+  .civi-react-events-title {
+    font-size: 1.25em;
+    line-height: 1.5em
+  }
+ 
+  .civi-react-events-description {
+    font-size: 1em;
+    line-height: 1.25em;
+    max-height: 2.5em;
+    overflow: hidden;
+    color: #888;
+  }
+
+  .civi-react-events-event:hover .civi-react-events-description {
+    max-height: unset;
   }

@@ -84,21 +84,21 @@ class App extends React.Component {
         return (
             <Container>
                 {events.map((event, index) => {
-                return (
-                    <Row index={index}>
-                        <Col md={2}>
-                            <Calendar
-                                start={event.start_date}
-                                end={event.end_date}
-                            />
-                        </Col>
-                        <Col md={10}>
-                            <h2>{event.title}</h2>
-                            <p>{event.summary}</p>
-                        </Col>
-                    </Row>
-                )
-            })}
+                    return (
+                        <Row index={index} className="civi-react-events-event">
+                            <Col md={'auto'}>
+                                <Calendar
+                                    start={event.start_date}
+                                    end={event.end_date}
+                                />
+                            </Col>
+                            <Col>
+                                <div className='civi-react-events-title'>{event.title}</div>
+                                <div className='civi-react-events-description'>{event.summary}</div>
+                            </Col>
+                        </Row>
+                    )
+                })}
             </Container>
         );
     }
