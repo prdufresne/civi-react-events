@@ -1,24 +1,16 @@
 import React from 'react';
 import { Container, Row, Col } from 'react-bootstrap';
 
-
 function Calendar(props) {
-    const weekday = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
-    const startParts = props.start.split(" ");
-    const endParts = props.end.split(" ");
-    const startDate = new Date(startParts[0]);
-    const endDate = new Date(endParts[0]);
+    const {startDate, endDate} = props;
 
-    const startWeekday = startDate.getDay();
-    const endWeekday = endDate.getDay();
-
-    let weekdayString = weekday[startWeekday];
-    let dayString = startDate.getDate();
+    let weekdayString = startDate.weekday;
+    let dayString = startDate.day;
     let style = "";
 
-    if(startParts[0] != endParts[0]) {
-        weekdayString = `${weekday[startWeekday].substring(0,3)}-${weekday[endWeekday].substring(0,3)}`
-        dayString += `-${endDate.getDate()}`;
+    if(startDate.date != endDate.date) {
+        weekdayString = `${startDate.weekday.substring(0,3)}-${endDate.weekday.substring(0,3)}`
+        dayString += `-${parseInt(endDate.day)}`;
         style = " multiday";
     }
 
@@ -28,6 +20,20 @@ function Calendar(props) {
             <div class={"civi-event-calendar-day" + style}>{dayString}</div>
         </div>
     )
+}
+
+function parseDate(dateString) {
+    const weekday = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+    let date = {};
+    if (dateString) {
+        const regEx = /(?<date>(?<year>\d{4})-(?<month>\d{2})-(?<day>\d{2})) (?<time>(?<hour>\d{2}):(?<minutes>\d{2})):(?<seconds>\d{2})/gm;
+        date = regEx.exec(dateString).groups;
+        date.day = parseInt(date.day);
+        const dateObject = new Date(date.date);
+        date.month = dateObject.toLocaleString('default', { month: 'long' })
+        date.weekday = weekday[dateObject.getDay()];
+    }
+    return date;
 }
 
 class App extends React.Component {
@@ -78,25 +84,36 @@ class App extends React.Component {
     render() {
 
         const { title, events } = this.state;
-
-        console.log("Events List:", events);
+        let currentMonth = "";
 
         return (
             <Container>
                 {events.map((event, index) => {
+                    const startDate = parseDate(event.start_date);
+                    const endDate = parseDate(event.end_date);
+                    let monthHeader = "";
+
+                    if(startDate.month != currentMonth) {
+                        currentMonth = startDate.month;
+                        monthHeader = (<h3>{currentMonth}</h3>);
+                    }
+
                     return (
-                        <Row index={index} className="civi-react-events-event">
-                            <Col md={'auto'}>
-                                <Calendar
-                                    start={event.start_date}
-                                    end={event.end_date}
-                                />
-                            </Col>
-                            <Col>
-                                <div className='civi-react-events-title'>{event.title}</div>
-                                <div className='civi-react-events-description'>{event.summary}</div>
-                            </Col>
-                        </Row>
+                        <>
+                            {monthHeader}
+                            <Row index={index} className="civi-react-events-event">
+                                <Col md={'auto'}>
+                                    <Calendar
+                                        startDate={startDate}
+                                        endDate={endDate}
+                                    />
+                                </Col>
+                                <Col>
+                                    <div className='civi-react-events-title'>{event.title}</div>
+                                    <div className='civi-react-events-description'>{event.summary}</div>
+                                </Col>
+                            </Row>
+                        </>
                     )
                 })}
             </Container>
