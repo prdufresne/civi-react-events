@@ -38,8 +38,12 @@ function admin_page() {
 
 function user_action() {
     // If the user is logged in, fire this function
-    $events = event_list();
-    echo json_encode($events);
+    $result = array(
+        'events' => event_list(),
+        'event_types' => event_type_list()
+    );
+
+    echo json_encode($result);
     wp_die();
 }
 
@@ -49,12 +53,39 @@ function non_user_action() {
     wp_die();
 }
 
+function event_type_list() {
+    $type_list = \Civi\Api4\OptionGroup::get(FALSE)
+        ->addSelect('id')
+        ->addWhere('name', '=', 'event_type')
+        ->setLimit(1)
+        ->addChain('type_list', \Civi\Api4\OptionValue::get(FALSE)
+            ->addSelect('id', 'label')
+            ->addWhere('option_group_id', '=', '$id')
+            ->setLimit(25)
+        )
+        ->execute()
+        ->first();
+    return $type_list['type_list'];
+}
+
 function event_list() {
-    $events = \Civi\Api4\Event::get()
-        ->addSelect('*')
+    $events = \Civi\Api4\Event::get(FALSE)
+        ->addSelect('id', 'title', 'summary', 'start_date', 'end_date', 'event_type_id:label', 'user_contact_id')
+        ->addWhere('start_date', '>=', date('Y-m-d'))
+        ->addWhere('end_date', '<=', date('Y'). '-12-31')
+        ->addChain('participants', \Civi\Api4\Participant::get(FALSE)
+            ->addSelect('COUNT(id) AS count')
+            ->addWhere('event_id', '=', '$id')
+        )
+        ->addChain('is_registered', \Civi\Api4\Participant::get(FALSE)
+            ->addSelect('COUNT(id) AS count')
+            ->addWhere('event_id', '=', '$id')
+            ->addWhere('contact_id', '=', 'user_contact_id')
+        )
         ->addOrderBy('start_date', 'ASC')
-        ->setLimit(25)
         ->execute();
+
+
     return $events;
 }
 

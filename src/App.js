@@ -43,6 +43,7 @@ class App extends React.Component {
         this.state = { 
             title: "Civi React Calendar",
             events: [],
+            eventTypes: [],
          };
     }
 
@@ -52,16 +53,30 @@ class App extends React.Component {
 
     loadData() {
         const events = this.fetchEvents()
-            .then((events) => {
+            .then((result) => {
+
+                console.log("result:", result);
+
+                const { events, event_types } = result;
+                // const eventTypes = [];
+
+                console.log("Event Types", event_types);
+
+                // parse dates and capture event types
+                events.forEach(event => {
+                    event.start_date = parseDate(event.start_date);
+                    event.end_date = parseDate(event.end_date);
+
+                });
+
                 this.setState({
                     events,
+                    eventTypes: event_types,
                 })
             });
-
     }
 
     fetchEvents = () => {
-
         return new Promise((resolve, reject) => {
             const queryParameters = {
                 'action': 'civi_react_events',
@@ -72,29 +87,25 @@ class App extends React.Component {
             jQuery.post(my_ajax_object.ajax_url, queryParameters,
                 function (response) {
                     return resolve(JSON.parse(response));
-                // },
-                // function (err) {
-                //     return reject(err);
                 }
-            );
+            ).fail(function (err) {
+                return reject(err);
+            })
         })
-
     }
 
     render() {
-
         const { title, events } = this.state;
         let currentMonth = "";
 
         return (
             <Container>
                 {events.map((event, index) => {
-                    const startDate = parseDate(event.start_date);
-                    const endDate = parseDate(event.end_date);
+                    const { start_date, end_date } = event;
                     let monthHeader = "";
 
-                    if(startDate.month != currentMonth) {
-                        currentMonth = startDate.month;
+                    if(start_date.month != currentMonth) {
+                        currentMonth = start_date.month;
                         monthHeader = (<h3>{currentMonth}</h3>);
                     }
 
@@ -104,8 +115,8 @@ class App extends React.Component {
                             <Row index={index} className="civi-react-events-event">
                                 <Col md={'auto'}>
                                     <Calendar
-                                        startDate={startDate}
-                                        endDate={endDate}
+                                        startDate={start_date}
+                                        endDate={end_date}
                                     />
                                 </Col>
                                 <Col>
