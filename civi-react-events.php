@@ -85,7 +85,6 @@ function event_list() {
         ->addOrderBy('start_date', 'ASC')
         ->execute();
 
-
     return $events;
 }
 

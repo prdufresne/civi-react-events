@@ -26,7 +26,7 @@
     display: block;
     float: left;
     width: 4em;
-    margin: 5px 5px;
+    margin: 10px 5px;
     border-radius: 10px;
     box-shadow: 3px 3px #aaa;
     margin-right: 10px;
@@ -68,12 +68,29 @@
  
   .civi-react-events-description {
     font-size: 1em;
-    line-height: 1.25em;
-    max-height: 2.5em;
+    line-height: 1.5em;
+    max-height: 3em;
     overflow: hidden;
     color: #888;
   }
 
   .civi-react-events-event:hover .civi-react-events-description {
+    display: unset;
     max-height: unset;
+  }
+ 
+  .civi-react-events-register {
+    text-align: center;
+    background-color: #0059b3;
+    color:#FFF;
+    padding: 5px 10px;
+    border-radius: 5px;
+    box-shadow: 3px 3px #aaa;
+    display: block;
+    float: right;
+    padding: 5px;
+    width: 7em;
+    font-family: Arial, Helvetica, sans-serif;
+    margin: 5px 5px;
+    cursor: pointer;
   }

@@ -120,6 +120,7 @@ class App extends React.Component {
                                     />
                                 </Col>
                                 <Col>
+                                    <div className={`civi-react-events-register ${event.event_type}`}>Register</div>
                                     <div className='civi-react-events-title'>{event.title}</div>
                                     <div className='civi-react-events-description'>{event.summary}</div>
                                 </Col>
