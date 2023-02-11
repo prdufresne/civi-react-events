@@ -8,7 +8,7 @@ function Calendar(props) {
     let dayString = startDate.day;
     let style = "";
 
-    if(startDate.date != endDate.date) {
+    if(endDate && startDate.date != endDate.date) {
         weekdayString = `${startDate.weekday.substring(0,3)}-${endDate.weekday.substring(0,3)}`
         dayString += `-${parseInt(endDate.day)}`;
         style = " multiday";
@@ -24,7 +24,7 @@ function Calendar(props) {
 
 function parseDate(dateString) {
     const weekday = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
-    let date = {};
+    let date = undefined;
     if (dateString) {
         const regEx = /(?<date>(?<year>\d{4})-(?<month>\d{2})-(?<day>\d{2})) (?<time>(?<hour>\d{2}):(?<minutes>\d{2})):(?<seconds>\d{2})/gm;
         date = regEx.exec(dateString).groups;
@@ -44,6 +44,7 @@ class App extends React.Component {
             title: "Civi React Calendar",
             events: [],
             eventTypes: [],
+            showFilter: false,
          };
     }
 
@@ -60,13 +61,12 @@ class App extends React.Component {
                 const { events, event_types } = result;
                 // const eventTypes = [];
 
-                console.log("Event Types", event_types);
-
                 // parse dates and capture event types
                 events.forEach(event => {
                     event.start_date = parseDate(event.start_date);
                     event.end_date = parseDate(event.end_date);
-
+                    event.is_registered = (event.is_registered[0].count > 0);
+                    event.participants = event.participants[0].count;
                 });
 
                 this.setState({
@@ -95,23 +95,36 @@ class App extends React.Component {
     }
 
     render() {
-        const { title, events } = this.state;
+        const { event_types, events, showFilter } = this.state;
         let currentMonth = "";
+
+        console.log("Event Types:", event_types);
+        console.log("Event List:", events)
 
         return (
             <Container>
+                <div className={`civi-react-events-button`} onClick={() => this.setState({showFilter: !showFilter})}>
+                    {showFilter ? 'Hide Filters' : 'Show Filters'}
+                </div>
+                {showFilter &&
+                    <div>
+                        Event Types:
+                    </div>
+                }
                 {events.map((event, index) => {
                     const { start_date, end_date } = event;
-                    let monthHeader = "";
+                    let isFirstMonth = false;
 
                     if(start_date.month != currentMonth) {
                         currentMonth = start_date.month;
-                        monthHeader = (<h3>{currentMonth}</h3>);
+                        isFirstMonth = true;
                     }
 
                     return (
                         <>
-                            {monthHeader}
+                            {isFirstMonth &&
+                                <h3>{currentMonth}</h3>
+                            }
                             <Row index={index} className="civi-react-events-event">
                                 <Col md={'auto'}>
                                     <Calendar
@@ -120,8 +133,14 @@ class App extends React.Component {
                                     />
                                 </Col>
                                 <Col>
-                                    <div className={`civi-react-events-register ${event.event_type}`}>Register</div>
-                                    <div className='civi-react-events-title'>{event.title}</div>
+                                    {event.is_online_registration &&
+                                        <a href={event.registration_url}>
+                                            <div className={`civi-react-events-button ${event.event_type}`}>Register</div>
+                                        </a>
+                                    }
+                                    <a href={event.event_url}>
+                                        <div className='civi-react-events-title'>{event.title}</div>
+                                    </a>
                                     <div className='civi-react-events-description'>{event.summary}</div>
                                 </Col>
                             </Row>

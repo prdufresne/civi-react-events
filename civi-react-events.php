@@ -70,9 +70,9 @@ function event_type_list() {
 
 function event_list() {
     $events = \Civi\Api4\Event::get(FALSE)
-        ->addSelect('id', 'title', 'summary', 'start_date', 'end_date', 'event_type_id:label', 'user_contact_id')
+        ->addSelect('id', 'title', 'summary', 'start_date', 'end_date', 'event_type_id:label', 'max_participants', 'is_online_registration')
         ->addWhere('start_date', '>=', date('Y-m-d'))
-        ->addWhere('end_date', '<=', date('Y'). '-12-31')
+        ->addWhere('start_date', '<=', date('Y'). '-12-31')
         ->addChain('participants', \Civi\Api4\Participant::get(FALSE)
             ->addSelect('COUNT(id) AS count')
             ->addWhere('event_id', '=', '$id')
@@ -84,6 +84,18 @@ function event_list() {
         )
         ->addOrderBy('start_date', 'ASC')
         ->execute();
+
+    // We should probably iterate through the events to add the event and registration URL.
+    // While we're at it, we can parse out the total participants, isregistered and full values.
+
+    $index = 0;
+    foreach($events as $event) {
+        $id = $event['id'];
+        $events[$index]['event_url'] = \CRM_Utils_System::url( 'civicrm/event/info', "reset=1&id=$id" );
+        $events[$index]['registration_url'] = \CRM_Utils_System::url( 'civicrm/event/register', "reset=1&id=$id" );
+        $index++;
+    }
+
 
     return $events;
 }
