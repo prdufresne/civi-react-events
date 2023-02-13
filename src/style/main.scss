@@ -10,7 +10,7 @@
 }
 
 .civi-react-events-event {
-  display: inline-block;
+  display: block;
   background-color: #F1F2F3;
   clear: both;
   margin-bottom: 5px;
@@ -75,7 +75,6 @@
   }
 
   .civi-react-events-event:hover .civi-react-events-description {
-    display: unset;
     max-height: unset;
   }
  
