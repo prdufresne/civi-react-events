@@ -59,7 +59,7 @@ function event_type_list() {
         ->addWhere('name', '=', 'event_type')
         ->setLimit(1)
         ->addChain('type_list', \Civi\Api4\OptionValue::get(FALSE)
-            ->addSelect('id', 'label')
+            ->addSelect('value', 'label')
             ->addWhere('option_group_id', '=', '$id')
             ->setLimit(25)
         )
@@ -70,7 +70,7 @@ function event_type_list() {
 
 function event_list() {
     $events = \Civi\Api4\Event::get(FALSE)
-        ->addSelect('id', 'title', 'summary', 'start_date', 'end_date', 'event_type_id:label', 'max_participants', 'is_online_registration')
+        ->addSelect('id', 'title', 'summary', 'start_date', 'end_date', 'event_type_id','event_type_id:label', 'max_participants', 'is_online_registration')
         ->addWhere('start_date', '>=', date('Y-m-d'))
         ->addWhere('start_date', '<=', date('Y'). '-12-31')
         ->addChain('participants', \Civi\Api4\Participant::get(FALSE)
@@ -93,9 +93,11 @@ function event_list() {
         $id = $event['id'];
         $events[$index]['event_url'] = \CRM_Utils_System::url( 'civicrm/event/info', "reset=1&id=$id" );
         $events[$index]['registration_url'] = \CRM_Utils_System::url( 'civicrm/event/register', "reset=1&id=$id" );
+        $events[$index]['participants'] = $event['participants'][0]['count'];
+        $events[$index]['is_registered'] = ($event['is_registered'][0]['count'] > 0);
+        $events[$index]['is_full'] = ($event['participants'][0]['count'] >= $event['max_participants']);
         $index++;
     }
-
 
     return $events;
 }

@@ -2,14 +2,14 @@ import React from 'react';
 import { Container, Row, Col } from 'react-bootstrap';
 
 function Calendar(props) {
-    const {startDate, endDate} = props;
+    const { startDate, endDate } = props;
 
     let weekdayString = startDate.weekday;
     let dayString = startDate.day;
     let style = "";
 
-    if(endDate && startDate.date != endDate.date) {
-        weekdayString = `${startDate.weekday.substring(0,3)}-${endDate.weekday.substring(0,3)}`
+    if (endDate && startDate.date != endDate.date) {
+        weekdayString = `${startDate.weekday.substring(0, 3)}-${endDate.weekday.substring(0, 3)}`
         dayString += `-${parseInt(endDate.day)}`;
         style = " multiday";
     }
@@ -23,7 +23,7 @@ function Calendar(props) {
 }
 
 function parseDate(dateString) {
-    const weekday = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+    const weekday = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
     let date = undefined;
     if (dateString) {
         const regEx = /(?<date>(?<year>\d{4})-(?<month>\d{2})-(?<day>\d{2})) (?<time>(?<hour>\d{2}):(?<minutes>\d{2})):(?<seconds>\d{2})/gm;
@@ -40,12 +40,15 @@ class App extends React.Component {
 
     constructor(props) {
         super(props);
-        this.state = { 
+        this.state = {
             title: "Civi React Calendar",
             events: [],
-            eventTypes: [],
+            event_types: [],
             showFilter: false,
-         };
+            filters: {},
+        };
+
+        this.changeHandler = this.changeHandler.bind(this);
     }
 
     componentDidMount() {
@@ -56,22 +59,42 @@ class App extends React.Component {
         const events = this.fetchEvents()
             .then((result) => {
 
-                console.log("result:", result);
+                // console.log("result:", result);
 
                 const { events, event_types } = result;
-                // const eventTypes = [];
 
                 // parse dates and capture event types
                 events.forEach(event => {
                     event.start_date = parseDate(event.start_date);
                     event.end_date = parseDate(event.end_date);
-                    event.is_registered = (event.is_registered[0].count > 0);
-                    event.participants = event.participants[0].count;
                 });
+
+                const filters = {
+                    applied: {
+                        event_type: false,
+                        registration: false,
+                        event_full: false,
+                    },
+                    event_type: {},
+                    registration: {
+                        registered: false,
+                        not_registered: false,
+                    },
+                    event_full: {
+                        available: false,
+                        full: false,
+
+                    }
+                }
+
+                event_types.forEach(event_type => {
+                    filters.event_type[event_type.value] = false;
+                })
 
                 this.setState({
                     events,
-                    eventTypes: event_types,
+                    event_types,
+                    filters,
                 })
             });
     }
@@ -94,58 +117,107 @@ class App extends React.Component {
         })
     }
 
-    render() {
-        const { event_types, events, showFilter } = this.state;
-        let currentMonth = "";
+    changeHandler(event) {
+        const { name, id, checked } = event.target;
+        const { filters } = this.state;
 
-        console.log("Event Types:", event_types);
-        console.log("Event List:", events)
+        filters[name][id.toString()] = checked;
+        filters.applied[name] = this.anyChecked(filters[name]);
+
+        this.setState({
+            filters,
+        })
+    }
+
+    anyChecked(filter) {
+        let checked = false;
+        filter && Object.keys(filter).forEach(key => {
+            checked = checked || filter[key];
+        })
+        return checked;
+    }
+
+    render() {
+        const { event_types, events, showFilter, filters } = this.state;
+        let currentMonth = "";
 
         return (
             <Container>
-                <div className={`civi-react-events-button`} onClick={() => this.setState({showFilter: !showFilter})}>
-                    {showFilter ? 'Hide Filters' : 'Show Filters'}
-                </div>
-                {showFilter &&
-                    <div>
-                        Event Types:
+                <div className="civi-react-events-filters">
+                    <div className={`civi-react-events-button`} onClick={() => this.setState({ showFilter: !showFilter })}>
+                        {showFilter ? 'Hide Filters' : 'Show Filters'}
                     </div>
-                }
+                    <Row style={showFilter ? {} : { display: "none" }}>
+                        <Col>
+                            {event_types.map((event_type, index) =>
+                                <>
+                                    <input type="checkbox"
+                                        name="event_type" id={event_type.value}
+                                        onChange={this.changeHandler}
+                                        checked={this.filters?.event_type[event_type.value]} />
+                                    <label>{event_type.label}</label>
+                                    <br />
+                                </>
+                            )}
+                        </Col>
+                        <Col>
+                            <input type="checkbox" name="registration" id='registered' onChange={this.changeHandler} />
+                            <label>Registered</label>
+                            <br />
+                            <input type="checkbox" name="registration" id='not_registered' onChange={this.changeHandler} />
+                            <label>Not Registered</label>
+                            <br />
+                            <input type="checkbox" name="event_full" id='available' onChange={this.changeHandler} />
+                            <label>Available Events</label>
+                            <br />
+                            <input type="checkbox" name="event_full" id='full' onChange={this.changeHandler} />
+                            <label>Full Events</label>
+                            <br />
+                        </Col>
+                    </Row>
+                </div>
                 {events.map((event, index) => {
-                    const { start_date, end_date } = event;
-                    let isFirstMonth = false;
 
-                    if(start_date.month != currentMonth) {
-                        currentMonth = start_date.month;
-                        isFirstMonth = true;
-                    }
+                    if ((!filters.applied.event_type || filters.event_type[event.event_type_id.toString()]) &&
+                        (!filters.applied.registration || filters.registration[event.is_registered ? 'registered' : 'not_registered']) &&
+                        (!filters.applied.event_full || filters.event_full[event.is_full ? 'full' : 'available'])
+                    ) {
 
-                    return (
-                        <>
-                            {isFirstMonth &&
-                                <h3>{currentMonth}</h3>
-                            }
-                            <Row index={index} className="civi-react-events-event">
-                                <Col md={'auto'}>
-                                    <Calendar
-                                        startDate={start_date}
-                                        endDate={end_date}
-                                    />
-                                </Col>
-                                <Col>
-                                    {event.is_online_registration &&
-                                        <a href={event.registration_url}>
-                                            <div className={`civi-react-events-button ${event.event_type}`}>Register</div>
+                        const { start_date, end_date } = event;
+                        let isFirstMonth = false;
+
+                        if (start_date.month != currentMonth) {
+                            currentMonth = start_date.month;
+                            isFirstMonth = true;
+                        }
+
+                        return (
+                            <>
+                                {isFirstMonth &&
+                                    <h3>{currentMonth}</h3>
+                                }
+                                <Row index={index} className="civi-react-events-event">
+                                    <Col md={'auto'}>
+                                        <Calendar
+                                            startDate={start_date}
+                                            endDate={end_date}
+                                        />
+                                    </Col>
+                                    <Col>
+                                        {event.is_online_registration &&
+                                            <a href={event.registration_url}>
+                                                <div className={`civi-react-events-button ${event.event_type}`}>Register</div>
+                                            </a>
+                                        }
+                                        <a href={event.event_url}>
+                                            <div className='civi-react-events-title'>{event.title}</div>
                                         </a>
-                                    }
-                                    <a href={event.event_url}>
-                                        <div className='civi-react-events-title'>{event.title}</div>
-                                    </a>
-                                    <div className='civi-react-events-description'>{event.summary}</div>
-                                </Col>
-                            </Row>
-                        </>
-                    )
+                                        <div className='civi-react-events-description'>{event.summary}</div>
+                                    </Col>
+                                </Row>
+                            </>
+                        )
+                    }
                 })}
             </Container>
         );
