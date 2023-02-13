@@ -15,9 +15,9 @@ function Calendar(props) {
     }
 
     return (
-        <div class="civi-event-calendar-cell-date">
-            <div class="civi-event-calendar-weekday">{weekdayString}</div>
-            <div class={"civi-event-calendar-day" + style}>{dayString}</div>
+        <div class="civi-react-events-cell-date">
+            <div class="civi-react-events-weekday">{weekdayString}</div>
+            <div class={"civi-react-events-day" + style}>{dayString}</div>
         </div>
     )
 }
@@ -196,7 +196,7 @@ class App extends React.Component {
                                 {isFirstMonth &&
                                     <h3>{currentMonth}</h3>
                                 }
-                                <Row index={index} className="civi-react-events-event">
+                                <Row index={index} type={event['event_type_id:label']} className="civi-react-events-event">
                                     <Col md={'auto'}>
                                         <Calendar
                                             startDate={start_date}
@@ -204,14 +204,16 @@ class App extends React.Component {
                                         />
                                     </Col>
                                     <Col>
-                                        {event.is_online_registration &&
+                                        {event.is_online_registration && !event.is_full && !event.is_registered &&
                                             <a href={event.registration_url}>
-                                                <div className={`civi-react-events-button ${event.event_type}`}>Register</div>
+                                                <div className={`civi-react-events-button`}>Register</div>
                                             </a>
                                         }
-                                        <a href={event.event_url}>
-                                            <div className='civi-react-events-title'>{event.title}</div>
-                                        </a>
+                                        <div className='civi-react-events-title'>
+                                            <a href={event.event_url}>{event.title}</a>
+                                            {event.is_full && <div className='civi-react-events-pill full'>Full</div>}
+                                            {event.is_registered && <div className='civi-react-events-pill registered'>Registered</div>}
+                                        </div>
                                         <div className='civi-react-events-description'>{event.summary}</div>
                                     </Col>
                                 </Row>

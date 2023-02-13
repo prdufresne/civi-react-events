@@ -101,3 +101,60 @@
     height: 1.25em;
     vertical-align: text-bottom;
   }
+
+  .civi-react-events-pill {
+    display: inline-block;
+    margin-left: 1em;
+    line-height: 1em;
+    font-size: .75em;
+    border-radius: 1em;
+    background-color: #555;
+    color: white;
+    padding: 2px 15px;
+  }
+
+  .civi-react-events-pill.full {
+    background-color: #b30000;
+    color: white;
+  }
+
+  .civi-react-events-pill.registered {
+    background-color: #048004;
+    color: white;
+  }
+
+  .civi-react-events-event[type="Member-Run"] {
+		border-bottom: solid 5px #b30000;
+  }
+
+  .civi-react-events-event[type="Member-Run"] .civi-react-events-weekday {
+		color: #fff;
+		background-color: #b30000;
+  }
+  
+  .civi-react-events-event[type="Open-Run"] {
+		border-bottom: solid 5px #048004;
+  }
+
+  .civi-react-events-event[type="Open-Run"] .civi-react-events-weekday {
+		color: #fff;
+		background-color: #048004;
+  }
+
+  .civi-react-events-event[type="Wing-Night"] {
+		border-bottom: solid 5px #0059b3;
+}
+
+  .civi-react-events-event[type="Wing-Night"] .civi-react-events-weekday {
+		color: #fff;
+		background-color: #0059b3;
+}
+
+  .civi-react-events-event[type="AGM"] {
+		border-bottom: solid 5px #b37d00;
+}
+
+  .civi-react-events-event[type="AGM"] .civi-react-events-weekday {
+		color: #fff;
+		background-color: #b37d00;
+}
