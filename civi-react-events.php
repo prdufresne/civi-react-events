@@ -61,6 +61,7 @@ function event_type_list() {
         ->addChain('type_list', \Civi\Api4\OptionValue::get(FALSE)
             ->addSelect('value', 'label')
             ->addWhere('option_group_id', '=', '$id')
+            ->addWhere('is_active', '=', TRUE)
             ->setLimit(25)
         )
         ->execute()
