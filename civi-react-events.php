@@ -96,7 +96,7 @@ function event_list() {
         $events[$index]['registration_url'] = \CRM_Utils_System::url( 'civicrm/event/register', "reset=1&id=$id" );
         $events[$index]['participants'] = $event['participants'][0]['count'];
         $events[$index]['is_registered'] = ($event['is_registered'][0]['count'] > 0);
-        $events[$index]['is_full'] = ($event['participants'][0]['count'] >= $event['max_participants']);
+        $events[$index]['is_full'] = $event['is_online_registration']  && ($event['participants'][0]['count'] >= $event['max_participants']);
         $index++;
     }
 
