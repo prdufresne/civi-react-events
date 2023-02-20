@@ -1,5 +1,4 @@
 import React from 'react';
-import { Container, Row, Col } from 'react-bootstrap';
 
 function Calendar(props) {
     const { startDate, endDate } = props;
@@ -142,13 +141,13 @@ class App extends React.Component {
         let currentMonth = "";
 
         return (
-            <Container>
-                <div className="civi-react-events-filters">
+            <div>
+                <div className={`civi-react-events-filter-block`}>
                     <div className={`civi-react-events-button`} onClick={() => this.setState({ showFilter: !showFilter })}>
                         {showFilter ? 'Hide Filters' : 'Show Filters'}
                     </div>
-                    <Row style={showFilter ? {} : { display: "none" }}>
-                        <Col>
+                    <div className={`civi-react-events-filters ${showFilter ? '' : 'hide'}`}>
+                        <div className="civi-react-events-filters-types">
                             {event_types.map((event_type, index) =>
                                 <>
                                     <input type="checkbox"
@@ -159,8 +158,8 @@ class App extends React.Component {
                                     <br />
                                 </>
                             )}
-                        </Col>
-                        <Col>
+                        </div>
+                        <div  className="civi-react-events-filters-status">
                             <input type="checkbox" name="registration" id='registered' onChange={this.changeHandler} />
                             <label>Registered</label>
                             <br />
@@ -173,8 +172,8 @@ class App extends React.Component {
                             <input type="checkbox" name="event_full" id='full' onChange={this.changeHandler} />
                             <label>Full Events</label>
                             <br />
-                        </Col>
-                    </Row>
+                        </div>
+                    </div>
                 </div>
                 {events.map((event, index) => {
 
@@ -196,34 +195,34 @@ class App extends React.Component {
                                 {isFirstMonth &&
                                     <h3>{currentMonth}</h3>
                                 }
-                                <a href={event.registration_url}>
-                                    <Row index={index} type={event['event_type_id:label']} className="civi-react-events-event">
-                                        <Col md={'auto'}>
+                                <div index={index} type={event['event_type_id:label']} className="civi-react-events-event">
+                                    <a href={event.event_url}>
+                                        {/* <div className="civi-react-events-date-column"> */}
                                             <Calendar
                                                 startDate={start_date}
                                                 endDate={end_date}
                                             />
-                                        </Col>
-                                        <Col>
+                                        {/* </div> */}
+                                        <div className="civi-react-events-content-column">
                                             {event.is_online_registration && !event.is_full && !event.is_registered &&
-
-                                                <div className={`civi-react-events-button`}>Register</div>
-
+                                                <a href={event.registration_url}>
+                                                    <div className={`civi-react-events-button`}>Register</div>
+                                                </a>
                                             }
                                             <div className='civi-react-events-title'>
-                                                <a href={event.event_url}>{event.title}</a>
+                                                {event.title}
                                                 {event.is_full && <div className='civi-react-events-pill full'>Full</div>}
                                                 {event.is_registered && <div className='civi-react-events-pill registered'>Registered</div>}
                                             </div>
                                             <div className='civi-react-events-description'>{event.summary}</div>
-                                        </Col>
-                                    </Row>
-                                </a>
+                                        </div>
+                                    </a>
+                                </div>
                             </>
                         )
                     }
                 })}
-            </Container>
+            </div>
         );
     }
 }

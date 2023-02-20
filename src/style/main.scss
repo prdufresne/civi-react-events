@@ -10,8 +10,9 @@
 }
 
 .civi-react-events-event {
-  display: block;
+  display: inline-block;
   background-color: #F1F2F3;
+  width: 100%;
   clear: both;
   margin-bottom: 5px;
   align-content: center;
@@ -20,6 +21,31 @@
   padding-left: 5px;
   padding-right: 5px;
   border-bottom: solid 5px #555;
+}
+
+.civi-react-events-filter-block {
+  display: block;
+  width: 100%;
+  clear: both;
+}
+
+.civi-react-events-filters.hide {
+  display: none;
+}
+
+.civi-react-events-filters-types {
+  display: block;
+  float: left;
+  width: 40%;
+}
+
+.civi-react-events-event:hover {
+  background-color: #E1E2E3;
+  text-decoration: inherit;
+}
+
+.civi-react-events-event a:hover {
+  text-decoration: inherit;
 }
 
 .civi-react-events-cell-date {
