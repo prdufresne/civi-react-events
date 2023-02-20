@@ -75,6 +75,16 @@ function parse_date($date_string) {
     return $result;
 }
 
+function participant_list($event_id) {
+    $participants = \Civi\Api4\Participant::get(FALSE)
+    ->addSelect('(contact_id.display_name) AS name', 'register_date')
+    ->addWhere('event_id', '=', $event_id)
+    ->addOrderBy('contact_id.last_name', 'ASC')
+    ->addOrderBy('contact_id.first_name', 'ASC')
+    ->execute();
+    return $participants;
+}
+
 function event_type_list() {
     $type_list = \Civi\Api4\OptionGroup::get(FALSE)
         ->addSelect('id')
