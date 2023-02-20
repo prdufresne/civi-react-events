@@ -1,6 +1,6 @@
 
 .civi-react-events {
-    display: flex;
+    display: block;
     padding-bottom: 20px;
 }
 
@@ -10,7 +10,7 @@
 }
 
 .civi-react-events-event {
-  display: block;
+  display: inline-block;
   background-color: #F1F2F3;
   width: 100%;
   clear: both;
@@ -52,10 +52,9 @@
     display: block;
     float: left;
     width: 4.5em;
-    margin: 10px 5px;
+    margin: 10px 15px 10px 5px;
     border-radius: 10px;
     box-shadow: 3px 3px #aaa;
-    margin-right: 10px;
   }
 
   .civi-react-events-weekday {
