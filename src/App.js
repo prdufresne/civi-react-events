@@ -196,27 +196,29 @@ class App extends React.Component {
                                 {isFirstMonth &&
                                     <h3>{currentMonth}</h3>
                                 }
-                                <Row index={index} type={event['event_type_id:label']} className="civi-react-events-event">
-                                    <Col md={'auto'}>
-                                        <Calendar
-                                            startDate={start_date}
-                                            endDate={end_date}
-                                        />
-                                    </Col>
-                                    <Col>
-                                        {event.is_online_registration && !event.is_full && !event.is_registered &&
-                                            <a href={event.registration_url}>
+                                <a href={event.registration_url}>
+                                    <Row index={index} type={event['event_type_id:label']} className="civi-react-events-event">
+                                        <Col md={'auto'}>
+                                            <Calendar
+                                                startDate={start_date}
+                                                endDate={end_date}
+                                            />
+                                        </Col>
+                                        <Col>
+                                            {event.is_online_registration && !event.is_full && !event.is_registered &&
+
                                                 <div className={`civi-react-events-button`}>Register</div>
-                                            </a>
-                                        }
-                                        <div className='civi-react-events-title'>
-                                            <a href={event.event_url}>{event.title}</a>
-                                            {event.is_full && <div className='civi-react-events-pill full'>Full</div>}
-                                            {event.is_registered && <div className='civi-react-events-pill registered'>Registered</div>}
-                                        </div>
-                                        <div className='civi-react-events-description'>{event.summary}</div>
-                                    </Col>
-                                </Row>
+
+                                            }
+                                            <div className='civi-react-events-title'>
+                                                <a href={event.event_url}>{event.title}</a>
+                                                {event.is_full && <div className='civi-react-events-pill full'>Full</div>}
+                                                {event.is_registered && <div className='civi-react-events-pill registered'>Registered</div>}
+                                            </div>
+                                            <div className='civi-react-events-description'>{event.summary}</div>
+                                        </Col>
+                                    </Row>
+                                </a>
                             </>
                         )
                     }
