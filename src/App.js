@@ -22,19 +22,19 @@ function Calendar(props) {
     )
 }
 
-function parseDate(dateString) {
-    const weekday = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-    let date = undefined;
-    if (dateString) {
-        const regEx = /(?<date>(?<year>\d{4})-(?<month>\d{2})-(?<day>\d{2})) (?<time>(?<hour>\d{2}):(?<minutes>\d{2})):(?<seconds>\d{2})/gm;
-        date = regEx.exec(dateString).groups;
-        date.day = parseInt(date.day);
-        const dateObject = new Date(date.date);
-        date.month = dateObject.toLocaleString('default', { month: 'long' })
-        date.weekday = weekday[dateObject.getDay()];
-    }
-    return date;
-}
+// function parseDate(dateString) {
+//     const weekday = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+//     let date = undefined;
+//     if (dateString) {
+//         const regEx = /(?<date>(?<year>\d{4})-(?<month>\d{2})-(?<day>\d{2})) (?<time>(?<hour>\d{2}):(?<minutes>\d{2})):(?<seconds>\d{2})/gm;
+//         date = regEx.exec(dateString).groups;
+//         date.day = parseInt(date.day);
+//         const dateObject = new Date(date.date);
+//         date.month = dateObject.toLocaleString('default', { month: 'long' })
+//         date.weekday = weekday[dateObject.getDay()];
+//     }
+//     return date;
+// }
 
 class App extends React.Component {
 
@@ -64,10 +64,10 @@ class App extends React.Component {
                 const { events, event_types } = result;
 
                 // parse dates and capture event types
-                events.forEach(event => {
-                    event.start_date = parseDate(event.start_date);
-                    event.end_date = parseDate(event.end_date);
-                });
+                // events.forEach(event => {
+                //     event.start_date = parseDate(event.start_date);
+                //     event.end_date = parseDate(event.end_date);
+                // });
 
                 const filters = {
                     applied: {

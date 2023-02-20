@@ -58,6 +58,23 @@ function non_user_action() {
     wp_die();
 }
 
+function parse_date($date_string) {
+    $result = null;
+    if($date_string != null) {
+        $date = date_create_from_format('Y-m-d H:i:s', $date_string);
+        $result = array(
+            'string' => $date_string,
+            'date' => date_format($date, 'Y-m-d'),
+            'year' => date_format($date, 'Y'),
+            'month' => date_format($date, 'F'),
+            'day' => date_format($date, 'j'),
+            'weekday' => date_format($date, 'l'),
+            'time' => date_format($time, 'g:ia'),
+        );
+    }   
+    return $result;
+}
+
 function event_type_list() {
     $type_list = \Civi\Api4\OptionGroup::get(FALSE)
         ->addSelect('id')
@@ -97,10 +114,12 @@ function event_list() {
     $index = 0;
     foreach($events as $event) {
         $id = $event['id'];
-        $events[$index]['event_url'] = \CRM_Utils_System::url( 'civicrm/event/info', "reset=1&id=$id" );
-        $events[$index]['registration_url'] = \CRM_Utils_System::url( 'civicrm/event/register', "reset=1&id=$id" );
+        $events[$index]['event_url'] = \CRM_Utils_System::url( 'civicrm/event/info', "reset=1&id=$id", false, false, true, true );
+        $events[$index]['registration_url'] = \CRM_Utils_System::url( 'civicrm/event/register', "reset=1&id=$id", false, false, true, true );
         $events[$index]['participants'] = $event['participants'][0]['count'];
         $events[$index]['is_registered'] = ($event['is_registered'][0]['count'] > 0);
+        $events[$index]['start_date'] = parse_date($event['start_date']);
+        $events[$index]['end_date'] = parse_date($event['end_date']);
         $events[$index]['is_full'] = $event['is_online_registration']  && ($event['participants'][0]['count'] >= $event['max_participants']);
         $index++;
     }
