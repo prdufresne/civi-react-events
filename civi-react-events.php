@@ -114,8 +114,8 @@ function event_list() {
     $index = 0;
     foreach($events as $event) {
         $id = $event['id'];
-        $events[$index]['event_url'] = \CRM_Utils_System::url( 'civicrm/event/info', "reset=1&id=$id", false, false, true, true );
-        $events[$index]['registration_url'] = \CRM_Utils_System::url( 'civicrm/event/register', "reset=1&id=$id", false, false, true, true );
+        $events[$index]['event_url'] = \CRM_Utils_System::url( 'civicrm/event/info', "reset=1&id=$id", false, false, false, true );
+        $events[$index]['registration_url'] = \CRM_Utils_System::url( 'civicrm/event/register', "reset=1&id=$id", false, false, false, true );
         $events[$index]['participants'] = $event['participants'][0]['count'];
         $events[$index]['is_registered'] = ($event['is_registered'][0]['count'] > 0);
         $events[$index]['start_date'] = parse_date($event['start_date']);
