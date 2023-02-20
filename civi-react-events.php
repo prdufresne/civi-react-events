@@ -69,7 +69,7 @@ function parse_date($date_string) {
             'month' => date_format($date, 'F'),
             'day' => date_format($date, 'j'),
             'weekday' => date_format($date, 'l'),
-            'time' => date_format($time, 'g:ia'),
+            'time' => date_format($date, 'g:ia'),
         );
     }   
     return $result;
