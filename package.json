@@ -24,11 +24,9 @@
   },
   "homepage": "https://github.com/prdufresne/civi-react-events#readme",
   "devDependencies": {
-    "@wordpress/scripts": "^25.3.0",
-    "css-minimizer-webpack-plugin": "^4.2.2"
+    "@wordpress/scripts": "^25.3.0"
   },
   "dependencies": {
-    "bootstrap": "^5.2.3",
-    "react-bootstrap": "^2.7.0"
+    "bootstrap": "^5.2.3"
   }
 }
