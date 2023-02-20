@@ -195,14 +195,12 @@ class App extends React.Component {
                                 {isFirstMonth &&
                                     <h3>{currentMonth}</h3>
                                 }
-                                <div index={index} type={event['event_type_id:label']} className="civi-react-events-event">
-                                    <a href={event.event_url}>
-                                        {/* <div className="civi-react-events-date-column"> */}
-                                            <Calendar
-                                                startDate={start_date}
-                                                endDate={end_date}
-                                            />
-                                        {/* </div> */}
+                                <a href={event.event_url}>
+                                    <div index={index} type={event['event_type_id:label']} className="civi-react-events-event">
+                                        <Calendar
+                                            startDate={start_date}
+                                            endDate={end_date}
+                                        />
                                         <div className="civi-react-events-content-column">
                                             {event.is_online_registration && !event.is_full && !event.is_registered &&
                                                 <a href={event.registration_url}>
@@ -216,8 +214,8 @@ class App extends React.Component {
                                             </div>
                                             <div className='civi-react-events-description'>{event.summary}</div>
                                         </div>
-                                    </a>
-                                </div>
+                                    </div>
+                                </a>
                             </>
                         )
                     }
