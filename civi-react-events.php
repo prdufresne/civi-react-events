@@ -38,21 +38,33 @@ function admin_page() {
 
 function user_action() {
     // If the user is logged in, fire this function
-    $result = array(
-        'events' => event_list(),
-        'event_types' => event_type_list()
-    );
+    $result = null;
 
+    if(isset($_POST["request"])){
+        switch($_POST["request"]) {
+            case "event-list":
+                $result = events_and_types();
+                break;
+            case "participant-list":
+                $result = participant_list($_POST["data"]);
+                break;
+        }
+    };
     echo json_encode($result);
     wp_die();
 }
 
 function non_user_action() {
-    // If the user is logged in, fire this function
-    $result = array(
-        'events' => event_list(),
-        'event_types' => event_type_list()
-    );
+    // If the user is not logged in, fire this function
+    $result = null;
+
+    if(isset($_POST["request"])){
+        switch($_POST["request"]) {
+            case "event-list":
+                $result = events_and_types();
+                break;
+        }
+    };
 
     echo json_encode($result);
     wp_die();
@@ -118,9 +130,6 @@ function event_list() {
         ->addOrderBy('start_date', 'ASC')
         ->execute();
 
-    // We should probably iterate through the events to add the event and registration URL.
-    // While we're at it, we can parse out the total participants, isregistered and full values.
-
     $index = 0;
     foreach($events as $event) {
         $id = $event['id'];
@@ -135,6 +144,14 @@ function event_list() {
     }
 
     return $events;
+}
+
+function events_and_types() {
+    $result = array(
+        'events' => event_list(),
+        'event_types' => event_type_list()
+    );
+    return $result;
 }
 
 function render_shortcode() {

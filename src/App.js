@@ -116,6 +116,24 @@ class App extends React.Component {
         })
     }
 
+    fetchParticipants = (id) => {
+        return new Promise((resolve, reject) => {
+            const queryParameters = {
+                'action': 'civi_react_events',
+                'request': 'participant-list',
+                'data': id,
+            };
+
+            jQuery.post(my_ajax_object.ajax_url, queryParameters,
+                function (response) {
+                    return resolve(JSON.parse(response));
+                }
+            ).fail(function (err) {
+                return reject(err);
+            })
+        })
+    }
+
     changeHandler(event) {
         const { name, id, checked } = event.target;
         const { filters } = this.state;
@@ -209,7 +227,11 @@ class App extends React.Component {
                                             }
                                             <div className='civi-react-events-title'>
                                                 {event.title}
-                                                {event.is_full && <div className='civi-react-events-pill full'>Full</div>}
+                                                {event.is_online_registration && (event.is_full ?
+                                                    <div className='civi-react-events-pill full'>Full</div>
+                                                    :
+                                                    <div className='civi-react-events-pill'>{`${event.participants}/${event.max_participants}`}</div>
+                                                )}
                                                 {event.is_registered && <div className='civi-react-events-pill registered'>Registered</div>}
                                             </div>
                                             <div className='civi-react-events-description'>{event.summary}</div>
