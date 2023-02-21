@@ -111,12 +111,15 @@
     border-radius: 5px;
     box-shadow: 3px 3px #aaa;
     display: block;
-    float: right;
     padding: 5px;
     width: 7em;
     font-family: Arial, Helvetica, sans-serif;
     margin: 5px 5px;
     cursor: pointer;
+  }
+
+  .civi-react-events-button.right {
+    float: right;
   }
 
   .civi-react-events-filters input[type="checkbox"] {
@@ -181,4 +184,18 @@
   .civi-react-events-event[type="AGM"] .civi-react-events-weekday {
 		color: #fff;
 		background-color: #b37d00;
+}
+
+.civi-react-events-actions {
+  float: right;
+  text-align: right;
+}
+
+.civi-react-events-actions img {
+  width: 1.5em;
+  margin-right: 5px;
+}
+
+.civi-react-events-action-icons {
+  display: block;
 }

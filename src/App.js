@@ -1,5 +1,7 @@
 import React from 'react';
 
+import peopleGroup from './icons/people-group.svg';
+
 function Calendar(props) {
     const { startDate, endDate } = props;
 
@@ -161,7 +163,7 @@ class App extends React.Component {
         return (
             <div>
                 <div className={`civi-react-events-filter-block`}>
-                    <div className={`civi-react-events-button`} onClick={() => this.setState({ showFilter: !showFilter })}>
+                    <div className={`civi-react-events-button right`} onClick={() => this.setState({ showFilter: !showFilter })}>
                         {showFilter ? 'Hide Filters' : 'Show Filters'}
                     </div>
                     <div className={`civi-react-events-filters ${showFilter ? '' : 'hide'}`}>
@@ -220,11 +222,16 @@ class App extends React.Component {
                                             endDate={end_date}
                                         />
                                         <div className="civi-react-events-content-column">
-                                            {event.is_online_registration && !event.is_full && !event.is_registered &&
-                                                <a href={event.registration_url}>
-                                                    <div className={`civi-react-events-button`}>Register</div>
-                                                </a>
-                                            }
+                                            <div className='civi-react-events-actions'>
+                                                {event.is_online_registration && !event.is_full && !event.is_registered &&
+                                                    <a href={event.registration_url}>
+                                                        <div className={`civi-react-events-button`}>Register</div>
+                                                    </a>
+                                                }
+                                                {/* <div className='civi-react-events-action-icons'> */}
+                                                <img src={peopleGroup} />
+                                                {/* </div> */}
+                                            </div>
                                             <div className='civi-react-events-title'>
                                                 {event.title}
                                                 {event.is_online_registration && (event.is_full ?
@@ -235,6 +242,7 @@ class App extends React.Component {
                                                 {event.is_registered && <div className='civi-react-events-pill registered'>Registered</div>}
                                             </div>
                                             <div className='civi-react-events-description'>{event.summary}</div>
+
                                         </div>
                                     </div>
                                 </a>
