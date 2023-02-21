@@ -118,6 +118,17 @@ class App extends React.Component {
         })
     }
 
+    showEventParticipants = (event, id) => {
+        event.stopPropagation();
+        this.fetchParticipants(id)
+            .then((result) => {
+                console.log("Participants are:", result);
+                this.setState({
+                    participantsList: result,
+                })
+            })
+    }
+
     fetchParticipants = (id) => {
         return new Promise((resolve, reject) => {
             const queryParameters = {
@@ -215,8 +226,12 @@ class App extends React.Component {
                                 {isFirstMonth &&
                                     <h3>{currentMonth}</h3>
                                 }
-                                <a href={event.event_url}>
-                                    <div index={index} type={event['event_type_id:label']} className="civi-react-events-event">
+                                {/* <a href={event.event_url}> */}
+                                    <div index={index}
+                                        type={event['event_type_id:label']}
+                                        className="civi-react-events-event"
+                                        onClick={() => this.props.history.push(event.event_url)}
+                                    >
                                         <Calendar
                                             startDate={start_date}
                                             endDate={end_date}
@@ -228,9 +243,7 @@ class App extends React.Component {
                                                         <div className={`civi-react-events-button`}>Register</div>
                                                     </a>
                                                 }
-                                                {/* <div className='civi-react-events-action-icons'> */}
-                                                <img src={peopleGroup} />
-                                                {/* </div> */}
+                                                <img src={peopleGroup} onClick={(e) => this.showEventParticipants(e, event.id)}/>
                                             </div>
                                             <div className='civi-react-events-title'>
                                                 {event.title}
@@ -245,7 +258,7 @@ class App extends React.Component {
 
                                         </div>
                                     </div>
-                                </a>
+                                {/* </a> */}
                             </>
                         )
                     }
