@@ -98,22 +98,22 @@ function participant_list($event_id) {
 }
 
 function user_status() {
-    $tags = \Civi\Api4\EntityTag::get(FALSE)
-        ->addSelect('tag_id.name', 'entity_id')
-        ->addWhere('entity_id', '=', 203)
-        ->addWhere('tag_id.name', '=', 'Trail Leader')
-        ->execute();
-
     $valid_status = array('New', 'Current', 'Grace');
 
     $memberships = \Civi\Api4\Membership::get(FALSE)
         ->addSelect('contact_id', 'membership_type_id:label', 'status_id:label')
-        ->addWhere('contact_id', '=', 203)
+        ->addWhere('contact_id', '=', 'user_contact_id')
         ->addWhere('membership_type_id:label', '=', 'Club Member')
         ->setLimit(25)
         ->execute();
     
         $is_member = (count($memberships) > 0 && in_array($memberships[0]['status_id:label'], $valid_status) );
+
+        $tags = \Civi\Api4\EntityTag::get(FALSE)
+            ->addSelect('tag_id.name', 'entity_id')
+            ->addWhere('entity_id', '=', $memberships[0]['contact_id'])
+            ->addWhere('tag_id.name', '=', 'Trail Leader')
+            ->execute();
 
     $result = array(
         'tags' => $tags,
