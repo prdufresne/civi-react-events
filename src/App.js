@@ -23,19 +23,32 @@ function Calendar(props) {
     )
 }
 
-// function parseDate(dateString) {
-//     const weekday = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-//     let date = undefined;
-//     if (dateString) {
-//         const regEx = /(?<date>(?<year>\d{4})-(?<month>\d{2})-(?<day>\d{2})) (?<time>(?<hour>\d{2}):(?<minutes>\d{2})):(?<seconds>\d{2})/gm;
-//         date = regEx.exec(dateString).groups;
-//         date.day = parseInt(date.day);
-//         const dateObject = new Date(date.date);
-//         date.month = dateObject.toLocaleString('default', { month: 'long' })
-//         date.weekday = weekday[dateObject.getDay()];
-//     }
-//     return date;
-// }
+function ParticipantsModal(props) {
+
+    return (
+        <div className={`civi-react-events-modal`} onClick={props.closeModal}>
+            <div className='civi-react-events-modal-content'>
+                <h3>Event Participants</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Attendee Role</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {props.participants.map((participant, index) =>
+                            <tr>
+                                <td>{participant.name}</td>
+                                <td>{participant['role_id:label'].join(', ')}</td>
+                            </tr>
+                        )}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    )
+}
 
 class App extends React.Component {
 
@@ -47,9 +60,11 @@ class App extends React.Component {
             event_types: [],
             showFilter: false,
             filters: {},
+            participantsList: undefined,
         };
 
         this.changeHandler = this.changeHandler.bind(this);
+        this.closeParticipantsModal = this.closeParticipantsModal.bind(this);
     }
 
     componentDidMount() {
@@ -62,13 +77,7 @@ class App extends React.Component {
 
                 // console.log("result:", result);
 
-                const { events, event_types } = result;
-
-                // parse dates and capture event types
-                // events.forEach(event => {
-                //     event.start_date = parseDate(event.start_date);
-                //     event.end_date = parseDate(event.end_date);
-                // });
+                const { events, event_types, user_status } = result;
 
                 const filters = {
                     applied: {
@@ -92,10 +101,14 @@ class App extends React.Component {
                     filters.event_type[event_type.value] = false;
                 })
 
+                console.log("user_status:", user_status);
+
                 this.setState({
                     events,
                     event_types,
                     filters,
+                    is_member: user_status.is_member,
+                    is_trail_leader: user_status.is_trail_leader,
                 })
             });
     }
@@ -122,7 +135,7 @@ class App extends React.Component {
         event.stopPropagation();
         this.fetchParticipants(id)
             .then((result) => {
-                console.log("Participants are:", result);
+                console.log(`Participants for ${id} are:`, result);
                 this.setState({
                     participantsList: result,
                 })
@@ -159,6 +172,12 @@ class App extends React.Component {
         })
     }
 
+    closeParticipantsModal() {
+        this.setState({
+            participantsList: undefined,
+        })
+    }
+
     anyChecked(filter) {
         let checked = false;
         filter && Object.keys(filter).forEach(key => {
@@ -171,8 +190,11 @@ class App extends React.Component {
         const { event_types, events, showFilter, filters } = this.state;
         let currentMonth = "";
 
+        console.log("participants list:", this.state.participantsList);
+
         return (
-            <div>
+            <div className='civi-react-events'>
+                {this.state.participantsList ? <ParticipantsModal closeModal={this.closeParticipantsModal} participants={this.state.participantsList} /> : ''}
                 <div className={`civi-react-events-filter-block`}>
                     <div className={`civi-react-events-button right`} onClick={() => this.setState({ showFilter: !showFilter })}>
                         {showFilter ? 'Hide Filters' : 'Show Filters'}
@@ -190,7 +212,7 @@ class App extends React.Component {
                                 </>
                             )}
                         </div>
-                        <div  className="civi-react-events-filters-status">
+                        <div className="civi-react-events-filters-status">
                             <input type="checkbox" name="registration" id='registered' onChange={this.changeHandler} />
                             <label>Registered</label>
                             <br />
@@ -227,37 +249,39 @@ class App extends React.Component {
                                     <h3>{currentMonth}</h3>
                                 }
                                 {/* <a href={event.event_url}> */}
-                                    <div index={index}
-                                        type={event['event_type_id:label']}
-                                        className="civi-react-events-event"
-                                        onClick={() => this.props.history.push(event.event_url)}
-                                    >
-                                        <Calendar
-                                            startDate={start_date}
-                                            endDate={end_date}
-                                        />
-                                        <div className="civi-react-events-content-column">
-                                            <div className='civi-react-events-actions'>
-                                                {event.is_online_registration && !event.is_full && !event.is_registered &&
-                                                    <a href={event.registration_url}>
-                                                        <div className={`civi-react-events-button`}>Register</div>
-                                                    </a>
-                                                }
-                                                <img src={peopleGroup} onClick={(e) => this.showEventParticipants(e, event.id)}/>
-                                            </div>
-                                            <div className='civi-react-events-title'>
-                                                {event.title}
-                                                {event.is_online_registration && (event.is_full ?
-                                                    <div className='civi-react-events-pill full'>Full</div>
-                                                    :
-                                                    <div className='civi-react-events-pill'>{`${event.participants}/${event.max_participants}`}</div>
-                                                )}
-                                                {event.is_registered && <div className='civi-react-events-pill registered'>Registered</div>}
-                                            </div>
-                                            <div className='civi-react-events-description'>{event.summary}</div>
-
+                                <div index={index}
+                                    type={event['event_type_id:label']}
+                                    className="civi-react-events-event"
+                                    onClick={() => this.props.history.push(event.event_url)}
+                                >
+                                    <Calendar
+                                        startDate={start_date}
+                                        endDate={end_date}
+                                    />
+                                    <div className="civi-react-events-content-column">
+                                        <div className='civi-react-events-actions'>
+                                            {event.is_online_registration && !event.is_full && !event.is_registered &&
+                                                <a href={event.registration_url}>
+                                                    <div className={`civi-react-events-button`}>Register</div>
+                                                </a>
+                                            }
+                                            {event.is_online_registration && this.state.is_trail_leader &&
+                                                <img src={peopleGroup} onClick={(e) => this.showEventParticipants(e, event.id)} />
+                                            }
                                         </div>
+                                        <div className='civi-react-events-title'>
+                                            {event.title}
+                                            {event.is_online_registration && (event.is_full ?
+                                                <div className='civi-react-events-pill full'>Full</div>
+                                                :
+                                                <div className='civi-react-events-pill'>{`${event.participants}/${event.max_participants}`}</div>
+                                            )}
+                                            {event.is_registered && <div className='civi-react-events-pill registered'>Registered</div>}
+                                        </div>
+                                        <div className='civi-react-events-description'>{event.summary}</div>
+
                                     </div>
+                                </div>
                                 {/* </a> */}
                             </>
                         )
