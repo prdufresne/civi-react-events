@@ -101,8 +101,6 @@ class App extends React.Component {
                     filters.event_type[event_type.value] = false;
                 })
 
-                console.log("user_status:", user_status);
-
                 this.setState({
                     events,
                     event_types,
@@ -135,7 +133,6 @@ class App extends React.Component {
         event.stopPropagation();
         this.fetchParticipants(id)
             .then((result) => {
-                console.log(`Participants for ${id} are:`, result);
                 this.setState({
                     participantsList: result,
                 })
@@ -189,8 +186,6 @@ class App extends React.Component {
     render() {
         const { event_types, events, showFilter, filters } = this.state;
         let currentMonth = "";
-
-        console.log("participants list:", this.state.participantsList);
 
         return (
             <div className='civi-react-events'>
