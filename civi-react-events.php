@@ -48,6 +48,17 @@ function user_action() {
             case "participant-list":
                 $result = participant_list($_POST["data"]);
                 break;
+            case 'register-for-event':
+                $result = event_register($_POST["data"]);
+                break;
+            case 'deregister-from-event':
+                $result = event_deregister($_POST["data"]);
+                break;
+            default:
+                $result = array(
+                    'message' => 'Invalid request',
+                    'success' => false,
+                );
         }
     };
     echo json_encode($result);
@@ -63,6 +74,11 @@ function non_user_action() {
             case "event-list":
                 $result = events_and_types();
                 break;
+            default:
+                $result = array(
+                    'message' => 'Invalid request',
+                    'error' => true,
+                );
         }
     };
 
@@ -89,7 +105,7 @@ function parse_date($date_string) {
 
 function participant_list($event_id) {
     $participants = \Civi\Api4\Participant::get(FALSE)
-    ->addSelect('(contact_id.display_name) AS name', 'role_id:label')
+    ->addSelect('(contact_id.display_name) AS name', 'role_id:label', 'status_id:label')
     ->addWhere('event_id', '=', $event_id)
     ->addOrderBy('contact_id.last_name', 'ASC')
     ->addOrderBy('contact_id.first_name', 'ASC')
@@ -128,6 +144,7 @@ function user_status() {
     $result = array(
         // 'tags' => $tags,
         // 'memberships' => $memberships,
+        'contact_id' => $memberships[0]['contact_id'],
         'is_member' => $is_member,
         'is_trail_leader' => ($is_member && (count($tags) > 0)),
         'is_executive' => $is_executive,
@@ -161,10 +178,12 @@ function event_list() {
         ->addChain('participants', \Civi\Api4\Participant::get(FALSE)
             ->addSelect('COUNT(id) AS count')
             ->addWhere('event_id', '=', '$id')
+            ->addwhere('status_id:label', '=', 'Registered')
         )
         ->addChain('is_registered', \Civi\Api4\Participant::get(FALSE)
             ->addSelect('COUNT(id) AS count')
             ->addWhere('event_id', '=', '$id')
+            ->addwhere('status_id:label', '=', 'Registered')
             ->addWhere('contact_id', '=', 'user_contact_id')
         )
         ->addOrderBy('start_date', 'ASC')
@@ -194,6 +213,77 @@ function events_and_types() {
     );
     return $result;
 }
+
+function event_register($event_id, $role = 'Attendee') {
+    $user_status = user_status();
+    $result = null;
+    $event_id = intval($event_id);
+
+    if($user_status['is_member']) {
+        $is_registered = \Civi\Api4\Participant::get(FALSE)
+            ->addSelect('id', 'status_id:label')
+            ->addWhere('event_id', '=', $event_id)
+            ->addWhere('contact_id', '=', 'user_contact_id')
+            ->execute();
+
+        if(count($is_registered) == 0 ) {
+            $result = \Civi\Api4\Participant::create(FALSE)
+                ->addValue('contact_id', 'user_contact_id')
+                ->addValue('event_id', $event_id)
+                ->addValue('role_id:label', [
+                    $role,
+                ])
+                ->execute();
+        } elseif ($is_registered[0]['status_id:label'] == 'Cancelled') {
+            $results = \Civi\Api4\Participant::update()
+                ->addValue('status_id:label', 'Registered')
+                ->addWhere('id', '=', $is_registered[0]['id'])
+                ->execute();
+        } else {
+            $result = "Oh no, Mr Bill!";
+        }
+    } else {
+        $result = array(
+            'role' => $role,
+            'event_id' => $event_id,
+            'user_status' => $user_status,
+            'message' => 'This user is not a member',
+            'error' => true,
+        );
+    };
+    return $result;
+}
+
+function event_deregister($event_id, $role = 'Attendee') {
+    $user_status = user_status();
+    $result = null;
+    $event_id = intval($event_id);
+
+    if($user_status['is_member']) {
+        $is_registered = \Civi\Api4\Participant::get(FALSE)
+            ->addSelect('id', 'status_id:label')
+            ->addWhere('event_id', '=', $event_id)
+            ->addWhere('contact_id', '=', 'user_contact_id')
+            ->execute();
+
+        if(count($is_registered) > 0 && $is_registered[0]['status_id:label'] == 'Registered') {
+        $results = \Civi\Api4\Participant::update()
+            ->addValue('status_id:label', 'Cancelled')
+            ->addWhere('id', '=', $is_registered[0]['id'])
+            ->execute();
+        }
+    } else {
+        $result = array(
+            'role' => $role,
+            'event_id' => $event_id,
+            'user_status' => $user_status,
+            'message' => 'This user is not a member',
+            'error' => true,
+        );
+    };
+    return $result;
+}
+
 
 function render_shortcode() {
 

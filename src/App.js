@@ -1,6 +1,7 @@
 import React from 'react';
 
 import peopleGroup from './icons/people-group.svg';
+import trashCan from './icons/trash-can.svg';
 
 function Calendar(props) {
     const { startDate, endDate } = props;
@@ -34,13 +35,15 @@ function ParticipantsModal(props) {
                         <tr>
                             <th>Name</th>
                             <th>Attendee Role</th>
+                            <th>Status</th>
                         </tr>
                     </thead>
                     <tbody>
                         {props.participants.map((participant, index) =>
                             <tr>
                                 <td>{participant.name}</td>
-                                <td>{participant['role_id:label'].join(', ')}</td>
+                                <td>{participant['role_id:label'] && participant['role_id:label'].join(', ')}</td>
+                                <td>{participant['status_id:label']}</td>
                             </tr>
                         )}
                     </tbody>
@@ -51,11 +54,18 @@ function ParticipantsModal(props) {
 }
 
 function RegistrationModal(props) {
-    
+
+  
     return (
         <div className={`civi-react-events-modal`} onClick={props.closeModal}>
             <div className='civi-react-events-modal-content'>
-                {props.event.intro_text}
+                <div dangerouslySetInnerHTML={{
+                    __html:
+                        `${props.event.intro_text}
+                        <h3>${props.event.confirm_title}</h3>
+                        ${props.event.confirm_text}`
+                }} />
+                <div className={`civi-react-events-button`} onClick={(e) => props.register(e, props.event.id)}>Register</div>
             </div>
         </div>
     )
@@ -65,12 +75,32 @@ class App extends React.Component {
 
     constructor(props) {
         super(props);
+
+        const filters = {
+            applied: {
+                event_type: false,
+                registration: false,
+                event_full: false,
+            },
+            event_type: {},
+            registration: {
+                registered: false,
+                not_registered: false,
+            },
+            event_full: {
+                available: false,
+                full: false,
+
+            }
+        }
+
+
         this.state = {
             title: "Civi React Calendar",
             events: [],
             event_types: [],
             showFilter: false,
-            filters: {},
+            filters,
             participantsList: undefined,
             eventToRegister: undefined,
         };
@@ -79,6 +109,7 @@ class App extends React.Component {
         this.closeParticipantsModal = this.closeParticipantsModal.bind(this);
         this.closeRegistrationModal = this.closeRegistrationModal.bind(this);
         this.registerForEvent = this.registerForEvent.bind(this);
+        this.loadData = this.loadData.bind(this);
     }
 
     componentDidMount() {
@@ -91,27 +122,12 @@ class App extends React.Component {
 
                 // console.log("result:", result);
 
-                const { events, event_types, user_status } = result;
-
-                const filters = {
-                    applied: {
-                        event_type: false,
-                        registration: false,
-                        event_full: false,
-                    },
-                    event_type: {},
-                    registration: {
-                        registered: false,
-                        not_registered: false,
-                    },
-                    event_full: {
-                        available: false,
-                        full: false,
-
-                    }
-                }
+                const { events, event_types, user_status } = result;   
+                
+                const filters = this.state.filters;
 
                 event_types.forEach(event_type => {
+                    if(!(event_type.value in filters.event_type))
                     filters.event_type[event_type.value] = false;
                 })
 
@@ -195,10 +211,15 @@ class App extends React.Component {
     }
 
     registrationClickHandler(e, event) {
-        e.stopPropagation();
-        this.setState({
-            eventToRegister: event
-        })
+
+        if (this.state.is_member) {
+            e.stopPropagation();
+            this.setState({
+                eventToRegister: event
+            })
+        } else {
+            this.handleNavigate(event.registration_url)
+        }
     }
 
     closeRegistrationModal(event) {
@@ -208,10 +229,42 @@ class App extends React.Component {
         })
     }
 
-    registerForEvent(e, event) {
-        e.stopPropagation();
-        console.log("Registering for event ", event)
-        this.closeParticipantsModal();
+    registerForEvent(e, id) {
+        const queryParameters = {
+            'action': 'civi_react_events',
+            'request': 'register-for-event',
+            'data': id,
+        };
+
+        const loadData = this.loadData;
+        jQuery.post(my_ajax_object.ajax_url, queryParameters,
+            function (response) {
+                console.log("Response:", response)
+                loadData();
+            }
+        ).fail(function (err) {
+            console.log("Could not register:", err)
+        })
+        this.closeRegistrationModal(e);       
+    }
+    
+    deregisterFromEvent(e, id) {
+        const queryParameters = {
+            'action': 'civi_react_events',
+            'request': 'deregister-from-event',
+            'data': id,
+        };
+
+        const loadData = this.loadData;
+        jQuery.post(my_ajax_object.ajax_url, queryParameters,
+            function (response) {
+                console.log("Response:", response)
+                loadData();
+            }
+        ).fail(function (err) {
+            console.log("Could not deregister:", err)
+        })
+        this.closeRegistrationModal(e);       
     }
 
     anyChecked(filter) {
@@ -309,12 +362,13 @@ class App extends React.Component {
                                     <div className="civi-react-events-content-column">
                                         <div className='civi-react-events-actions'>
                                             {event.is_online_registration && !event.is_full && !event.is_registered &&
-                                                // <a href={event.registration_url}>
-                                                    <div className={`civi-react-events-button`} onClick={(e) => this.registrationClickHandler(e,event)}>Register</div>
-                                                // </a>
+                                                <div className={`civi-react-events-button`} onClick={(e) => this.registrationClickHandler(e, event)}>Register</div>
                                             }
                                             {showParticipants &&
                                                 <img src={peopleGroup} onClick={(e) => this.showEventParticipants(e, event.id)} />
+                                            }
+                                            {event.is_registered &&
+                                                    <img fill="#b30000" src={trashCan} onClick={(e) => this.deregisterFromEvent(e, event.id)} />
                                             }
                                         </div>
                                         <div className='civi-react-events-title'>

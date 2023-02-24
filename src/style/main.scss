@@ -21,6 +21,7 @@
   padding-left: 5px;
   padding-right: 5px;
   border-bottom: solid 5px #555;
+  cursor: pointer;
 }
 
 .civi-react-events-filter-block {
@@ -194,10 +195,6 @@
 .civi-react-events-actions img {
   width: 1.5em;
   margin-right: 5px;
-}
-
-.civi-react-events-action-icons {
-  display: block;
 }
 
 // The outer modal shell takes up the entire screen so you can gey-out the background
