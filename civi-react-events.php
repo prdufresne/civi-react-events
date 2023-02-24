@@ -259,25 +259,23 @@ function event_deregister($event_id, $role = 'Attendee') {
     $result = null;
     $event_id = intval($event_id);
 
-    if($user_status['is_member']) {
-        $is_registered = \Civi\Api4\Participant::get(FALSE)
-            ->addSelect('id', 'status_id:label')
-            ->addWhere('event_id', '=', $event_id)
-            ->addWhere('contact_id', '=', 'user_contact_id')
-            ->execute();
+    $is_registered = \Civi\Api4\Participant::get(FALSE)
+        ->addSelect('id', 'status_id:label')
+        ->addWhere('event_id', '=', $event_id)
+        ->addWhere('contact_id', '=', 'user_contact_id')
+        ->execute();
 
-        if(count($is_registered) > 0 && $is_registered[0]['status_id:label'] == 'Registered') {
+    if(count($is_registered) > 0 && $is_registered[0]['status_id:label'] == 'Registered') {
         $results = \Civi\Api4\Participant::update()
             ->addValue('status_id:label', 'Cancelled')
             ->addWhere('id', '=', $is_registered[0]['id'])
             ->execute();
-        }
     } else {
         $result = array(
             'role' => $role,
             'event_id' => $event_id,
             'user_status' => $user_status,
-            'message' => 'This user is not a member',
+            'message' => 'This user is not registered for this event',
             'error' => true,
         );
     };
