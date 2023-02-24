@@ -89,12 +89,39 @@ function parse_date($date_string) {
 
 function participant_list($event_id) {
     $participants = \Civi\Api4\Participant::get(FALSE)
-    ->addSelect('(contact_id.display_name) AS name', 'register_date')
+    ->addSelect('(contact_id.display_name) AS name', 'role_id:label')
     ->addWhere('event_id', '=', $event_id)
     ->addOrderBy('contact_id.last_name', 'ASC')
     ->addOrderBy('contact_id.first_name', 'ASC')
     ->execute();
     return $participants;
+}
+
+function user_status() {
+    $valid_status = array('New', 'Current', 'Grace');
+
+    $memberships = \Civi\Api4\Membership::get(FALSE)
+        ->addSelect('contact_id', 'membership_type_id:label', 'status_id:label')
+        ->addWhere('contact_id', '=', 'user_contact_id')
+        ->addWhere('membership_type_id:label', '=', 'Club Member')
+        ->setLimit(25)
+        ->execute();
+    
+        $is_member = (count($memberships) > 0 && in_array($memberships[0]['status_id:label'], $valid_status) );
+
+        $tags = \Civi\Api4\EntityTag::get(FALSE)
+            ->addSelect('tag_id.name', 'entity_id')
+            ->addWhere('entity_id', '=', $memberships[0]['contact_id'])
+            ->addWhere('tag_id.name', '=', 'Trail Leader')
+            ->execute();
+
+    $result = array(
+        'tags' => $tags,
+        'memberships' => $memberships,
+        'is_member' => $is_member,
+        'is_trail_leader' => ($is_member && (count($tags) > 0))
+    );
+    return $result;
 }
 
 function event_type_list() {
@@ -149,7 +176,8 @@ function event_list() {
 function events_and_types() {
     $result = array(
         'events' => event_list(),
-        'event_types' => event_type_list()
+        'event_types' => event_type_list(),
+        'user_status' => user_status(),
     );
     return $result;
 }
