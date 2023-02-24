@@ -103,23 +103,34 @@ function user_status() {
     $memberships = \Civi\Api4\Membership::get(FALSE)
         ->addSelect('contact_id', 'membership_type_id:label', 'status_id:label')
         ->addWhere('contact_id', '=', 'user_contact_id')
-        ->addWhere('membership_type_id:label', '=', 'Club Member')
         ->setLimit(25)
         ->execute();
-    
-        $is_member = (count($memberships) > 0 && in_array($memberships[0]['status_id:label'], $valid_status) );
 
-        $tags = \Civi\Api4\EntityTag::get(FALSE)
-            ->addSelect('tag_id.name', 'entity_id')
-            ->addWhere('entity_id', '=', $memberships[0]['contact_id'])
-            ->addWhere('tag_id.name', '=', 'Trail Leader')
-            ->execute();
+    $is_member = false;
+    $is_executive = false;
+    foreach($memberships as $membership) {
+        if($membership['membership_type_id:label'] == 'Club Member' && in_array($membership['status_id:label'], $valid_status)) {
+            $is_member = true;
+        };
+        if($membership['membership_type_id:label'] == 'Executive' && in_array($membership['status_id:label'], $valid_status)) {
+            $is_executive = true;
+        };
+    };
+    
+    // $is_member = (count($memberships) > 0 && in_array($memberships[0]['status_id:label'], $valid_status) );
+
+    $tags = \Civi\Api4\EntityTag::get(FALSE)
+        ->addSelect('tag_id.name', 'entity_id')
+        ->addWhere('entity_id', '=', $memberships[0]['contact_id'])
+        ->addWhere('tag_id.name', '=', 'Trail Leader')
+        ->execute();
 
     $result = array(
-        'tags' => $tags,
-        'memberships' => $memberships,
+        // 'tags' => $tags,
+        // 'memberships' => $memberships,
         'is_member' => $is_member,
-        'is_trail_leader' => ($is_member && (count($tags) > 0))
+        'is_trail_leader' => ($is_member && (count($tags) > 0)),
+        'is_executive' => $is_executive,
     );
     return $result;
 }
@@ -142,7 +153,9 @@ function event_type_list() {
 
 function event_list() {
     $events = \Civi\Api4\Event::get(FALSE)
-        ->addSelect('id', 'title', 'summary', 'start_date', 'end_date', 'event_type_id','event_type_id:label', 'max_participants', 'is_online_registration')
+        ->addSelect('id', 'title', 'summary', 'start_date', 'end_date', 'event_type_id','event_type_id:label',
+            'max_participants', 'is_online_registration', 'intro_text', 'confirm_title', 'confirm_text', 'description'
+        )
         ->addWhere('start_date', '>=', date('Y-m-d'))
         ->addWhere('start_date', '<=', date('Y'). '-12-31')
         ->addChain('participants', \Civi\Api4\Participant::get(FALSE)

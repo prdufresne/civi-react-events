@@ -50,6 +50,17 @@ function ParticipantsModal(props) {
     )
 }
 
+function RegistrationModal(props) {
+    
+    return (
+        <div className={`civi-react-events-modal`} onClick={props.closeModal}>
+            <div className='civi-react-events-modal-content'>
+                {props.event.intro_text}
+            </div>
+        </div>
+    )
+}
+
 class App extends React.Component {
 
     constructor(props) {
@@ -61,10 +72,13 @@ class App extends React.Component {
             showFilter: false,
             filters: {},
             participantsList: undefined,
+            eventToRegister: undefined,
         };
 
         this.changeHandler = this.changeHandler.bind(this);
         this.closeParticipantsModal = this.closeParticipantsModal.bind(this);
+        this.closeRegistrationModal = this.closeRegistrationModal.bind(this);
+        this.registerForEvent = this.registerForEvent.bind(this);
     }
 
     componentDidMount() {
@@ -101,12 +115,16 @@ class App extends React.Component {
                     filters.event_type[event_type.value] = false;
                 })
 
+
+                console.log("User status:", user_status);
+
                 this.setState({
                     events,
                     event_types,
                     filters,
                     is_member: user_status.is_member,
                     is_trail_leader: user_status.is_trail_leader,
+                    is_executive: user_status.is_executive,
                 })
             });
     }
@@ -169,10 +187,31 @@ class App extends React.Component {
         })
     }
 
-    closeParticipantsModal() {
+    closeParticipantsModal(event) {
+        event.stopPropagation();
         this.setState({
             participantsList: undefined,
         })
+    }
+
+    registrationClickHandler(e, event) {
+        e.stopPropagation();
+        this.setState({
+            eventToRegister: event
+        })
+    }
+
+    closeRegistrationModal(event) {
+        event.stopPropagation();
+        this.setState({
+            eventToRegister: undefined,
+        })
+    }
+
+    registerForEvent(e, event) {
+        e.stopPropagation();
+        console.log("Registering for event ", event)
+        this.closeParticipantsModal();
     }
 
     anyChecked(filter) {
@@ -183,6 +222,10 @@ class App extends React.Component {
         return checked;
     }
 
+    handleNavigate(e,destination) {
+        window.location.href=destination;
+    }
+
     render() {
         const { event_types, events, showFilter, filters } = this.state;
         let currentMonth = "";
@@ -190,6 +233,11 @@ class App extends React.Component {
         return (
             <div className='civi-react-events'>
                 {this.state.participantsList ? <ParticipantsModal closeModal={this.closeParticipantsModal} participants={this.state.participantsList} /> : ''}
+                {this.state.eventToRegister ? <RegistrationModal
+                    event={this.state.eventToRegister}
+                    closeModal={this.closeRegistrationModal}
+                    register={this.registerForEvent}
+                /> : ''}
                 <div className={`civi-react-events-filter-block`}>
                     <div className={`civi-react-events-button right`} onClick={() => this.setState({ showFilter: !showFilter })}>
                         {showFilter ? 'Hide Filters' : 'Show Filters'}
@@ -230,6 +278,11 @@ class App extends React.Component {
                         (!filters.applied.event_full || filters.event_full[event.is_full ? 'full' : 'available'])
                     ) {
 
+                        const eventType = event['event_type_id:label'];
+                        const showParticipants = event.is_online_registration && (
+                            (this.state.is_executive && eventType == 'AGM') ||
+                            (this.state.is_trail_leader && (eventType == 'Member-Run' || eventType == 'Open-Run') )
+                        )
                         const { start_date, end_date } = event;
                         let isFirstMonth = false;
 
@@ -247,7 +300,7 @@ class App extends React.Component {
                                 <div index={index}
                                     type={event['event_type_id:label']}
                                     className="civi-react-events-event"
-                                    onClick={() => this.props.history.push(event.event_url)}
+                                    onClick={(e) => this.handleNavigate(e, event.event_url)}
                                 >
                                     <Calendar
                                         startDate={start_date}
@@ -256,11 +309,11 @@ class App extends React.Component {
                                     <div className="civi-react-events-content-column">
                                         <div className='civi-react-events-actions'>
                                             {event.is_online_registration && !event.is_full && !event.is_registered &&
-                                                <a href={event.registration_url}>
-                                                    <div className={`civi-react-events-button`}>Register</div>
-                                                </a>
+                                                // <a href={event.registration_url}>
+                                                    <div className={`civi-react-events-button`} onClick={(e) => this.registrationClickHandler(e,event)}>Register</div>
+                                                // </a>
                                             }
-                                            {event.is_online_registration && this.state.is_trail_leader &&
+                                            {showParticipants &&
                                                 <img src={peopleGroup} onClick={(e) => this.showEventParticipants(e, event.id)} />
                                             }
                                         </div>
