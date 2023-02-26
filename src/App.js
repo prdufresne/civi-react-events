@@ -106,6 +106,7 @@ class App extends React.Component {
         };
 
         this.changeHandler = this.changeHandler.bind(this);
+        this.clearFilters = this.clearFilters.bind(this);
         this.closeParticipantsModal = this.closeParticipantsModal.bind(this);
         this.closeRegistrationModal = this.closeRegistrationModal.bind(this);
         this.registerForEvent = this.registerForEvent.bind(this);
@@ -197,6 +198,24 @@ class App extends React.Component {
 
         filters[name][id.toString()] = checked;
         filters.applied[name] = this.anyChecked(filters[name]);
+
+        console.log("filters:", filters)
+
+        this.setState({
+            filters,
+        })
+    }
+
+    clearFilters(event) {
+        const { filters } = this.state;
+
+        Object.keys(filters).forEach((level1) => {
+            Object.keys(filters[level1]).forEach((level2) => {
+                filters[level1][level2] = false;
+            })
+        })
+
+        console.log("filters:", filters)
 
         this.setState({
             filters,
@@ -291,39 +310,44 @@ class App extends React.Component {
                     closeModal={this.closeRegistrationModal}
                     register={this.registerForEvent}
                 /> : ''}
-                <div className={`civi-react-events-filter-block`}>
+                {filters && <div className={`civi-react-events-filter-block`}>
                     <div className={`civi-react-events-button right`} onClick={() => this.setState({ showFilter: !showFilter })}>
                         {showFilter ? 'Hide Filters' : 'Show Filters'}
                     </div>
                     <div className={`civi-react-events-filters ${showFilter ? '' : 'hide'}`}>
-                        <div className="civi-react-events-filters-types">
+                        <div className="civi-react-events-filters-group">
                             {event_types.map((event_type, index) =>
                                 <>
                                     <input type="checkbox"
                                         name="event_type" id={event_type.value}
                                         onChange={this.changeHandler}
-                                        checked={this.filters?.event_type[event_type.value]} />
+                                        checked={filters.event_type[event_type.value]} />
                                     <label>{event_type.label}</label>
                                     <br />
                                 </>
                             )}
                         </div>
-                        <div className="civi-react-events-filters-status">
-                            <input type="checkbox" name="registration" id='registered' onChange={this.changeHandler} />
+                        <div className="civi-react-events-filters-group">
+                            <input type="checkbox" name="registration" id='registered' onChange={this.changeHandler}
+                                checked={filters.registration.registered} />
                             <label>Registered</label>
                             <br />
-                            <input type="checkbox" name="registration" id='not_registered' onChange={this.changeHandler} />
+                            <input type="checkbox" name="registration" id='not_registered' onChange={this.changeHandler}
+                                checked={filters.registration.not_registered} />
                             <label>Not Registered</label>
                             <br />
-                            <input type="checkbox" name="event_full" id='available' onChange={this.changeHandler} />
+                            <input type="checkbox" name="event_full" id='available' onChange={this.changeHandler}
+                                checked={filters.event_full.available} />
                             <label>Available Events</label>
                             <br />
-                            <input type="checkbox" name="event_full" id='full' onChange={this.changeHandler} />
+                            <input type="checkbox" name="event_full" id='full' onChange={this.changeHandler} 
+                                checked={filters.event_full.full} />
                             <label>Full Events</label>
                             <br />
                         </div>
+                        <div className={`civi-react-events-button right`} onClick={this.clearFilters}>Clear Filters</div>
                     </div>
-                </div>
+                </div> }
                 {events.map((event, index) => {
 
                     if ((!filters.applied.event_type || filters.event_type[event.event_type_id.toString()]) &&
