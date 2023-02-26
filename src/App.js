@@ -336,6 +336,11 @@ class App extends React.Component {
                             (this.state.is_executive && eventType == 'AGM') ||
                             (this.state.is_trail_leader && (eventType == 'Member-Run' || eventType == 'Open-Run') )
                         )
+
+                        const showRegistration = (event.is_online_registration && !event.is_full && !event.is_registered &&
+                            (!(eventType == 'Member-Run') || (eventType == 'Member-Run' && this.state.is_member) )
+                        )
+
                         const { start_date, end_date } = event;
                         let isFirstMonth = false;
 
@@ -361,7 +366,7 @@ class App extends React.Component {
                                     />
                                     <div className="civi-react-events-content-column">
                                         <div className='civi-react-events-actions'>
-                                            {event.is_online_registration && !event.is_full && !event.is_registered &&
+                                            {showRegistration &&
                                                 <div className={`civi-react-events-button`} onClick={(e) => this.registrationClickHandler(e, event)}>Register</div>
                                             }
                                             {showParticipants &&
