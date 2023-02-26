@@ -5,8 +5,8 @@
  * Requires at least: 5.8
  * Requires PHP:      7.0
  * Version:           0.1.1
- * Author:            Paul dufresne
- * License:           MIT
+ * Author:            Paul Dufresne
+ * License:           MI
  * License URI:       https://github.com/prdufresne/civi-react-events/blob/main/LICENSE
  * Text Domain:       civi_react_events
  */
