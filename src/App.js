@@ -2,8 +2,8 @@ import React from 'react';
 
 import peopleGroup from './icons/people-group.svg';
 import trashCan from './icons/trash-can.svg';
-import calendar from './icons/calendar.svg';
-import link from './icons/link.svg';
+import calendarLink from './icons/calendar-link.svg';
+
 
 function Calendar(props) {
     const { startDate, endDate } = props;
@@ -339,7 +339,7 @@ class App extends React.Component {
 
         return (
             <div className='civi-react-events'>
-                <a className='civi-react-events-ical' href={ical_link}><img src={calendar}/><img className='civi-react-events-ical-link' src={link}/> Copy this link to subscribe to this calendar</a>
+                <a className='civi-react-events-ical' href={ical_link}><img src={calendarLink}/>Copy this link to subscribe to this calendar</a>
                 {this.state.participantsList ? <ParticipantsModal closeModal={this.closeParticipantsModal} participants={this.state.participantsList} /> : ''}
                 {this.state.eventToRegister ? <RegistrationModal
                     event={this.state.eventToRegister}
