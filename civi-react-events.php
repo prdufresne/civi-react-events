@@ -206,10 +206,14 @@ function event_list() {
 }
 
 function events_and_types() {
+
+    $ical_link = \CRM_Utils_System::url( 'civicrm/event/ical' );
+
     $result = array(
         'events' => event_list(),
         'event_types' => event_type_list(),
         'user_status' => user_status(),
+        'ical_link' => $ical_link,
     );
     return $result;
 }
