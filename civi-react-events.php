@@ -235,13 +235,13 @@ function event_register($event_id, $role = 'Attendee') {
                     $role,
                 ])
                 ->execute();
-                $did_register = true;
+            $did_register = true;
         } elseif ($is_registered[0]['status_id:label'] == 'Cancelled') {
             $results = \Civi\Api4\Participant::update()
                 ->addValue('status_id:label', 'Registered')
                 ->addWhere('id', '=', $is_registered[0]['id'])
                 ->execute();
-                $did_register = true;
+            $did_register = true;
         } else {
             $result = "Oh no, Mr Bill!";
         }
@@ -254,7 +254,7 @@ function event_register($event_id, $role = 'Attendee') {
                 "Event Registration",
                 "",
                 "<h2>Event Details</h2>",
-            )
+            );
         }
 
     } else {
