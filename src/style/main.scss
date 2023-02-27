@@ -197,6 +197,23 @@
   margin-right: 5px;
 }
 
+.civi-react-events-ical {
+  margin-bottom: 10px;
+}
+
+.civi-react-events-ical img {
+  width: 1.75em;
+  margin-right: 5px;
+}
+
+img.civi-react-events-ical-link {
+  width: 1.2em;
+  position: relative;
+  left: -1.8em;
+  top: .3em;
+  
+}
+
 // The outer modal shell takes up the entire screen so you can gey-out the background
 .civi-react-events-modal {
   display: block;

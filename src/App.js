@@ -2,6 +2,8 @@ import React from 'react';
 
 import peopleGroup from './icons/people-group.svg';
 import trashCan from './icons/trash-can.svg';
+import calendar from './icons/calendar.svg';
+import link from './icons/link.svg';
 
 function Calendar(props) {
     const { startDate, endDate } = props;
@@ -71,6 +73,18 @@ function RegistrationModal(props) {
     )
 }
 
+function EventDetailsModal(props) {
+    return (
+        <div className={`civi-react-events-modal`} onClick={props.closeModal}>
+            <div className='civi-react-events-modal-content'>
+                <div dangerouslySetInnerHTML={{
+                    __html: props.event.description
+                }} />
+            </div>
+        </div>
+    )
+}
+
 class App extends React.Component {
 
     constructor(props) {
@@ -103,12 +117,14 @@ class App extends React.Component {
             filters,
             participantsList: undefined,
             eventToRegister: undefined,
+            eventDetails: undefined,
         };
 
         this.changeHandler = this.changeHandler.bind(this);
         this.clearFilters = this.clearFilters.bind(this);
         this.closeParticipantsModal = this.closeParticipantsModal.bind(this);
         this.closeRegistrationModal = this.closeRegistrationModal.bind(this);
+        this.closeEventDetails = this.closeEventDetails.bind(this);
         this.registerForEvent = this.registerForEvent.bind(this);
         this.loadData = this.loadData.bind(this);
     }
@@ -123,7 +139,7 @@ class App extends React.Component {
 
                 // console.log("result:", result);
 
-                const { events, event_types, user_status } = result;   
+                const { events, event_types, user_status, ical_link } = result;   
                 
                 const filters = this.state.filters;
 
@@ -138,6 +154,7 @@ class App extends React.Component {
                 this.setState({
                     events,
                     event_types,
+                    ical_link,
                     filters,
                     is_member: user_status.is_member,
                     is_trail_leader: user_status.is_trail_leader,
@@ -234,10 +251,21 @@ class App extends React.Component {
         if (this.state.is_member) {
             e.stopPropagation();
             this.setState({
-                eventToRegister: event
+                eventToRegister: event,
             })
         } else {
             this.handleNavigate(event.registration_url)
+        }
+    }
+
+    showDetailsClickHandler(e, event) {
+        e.stopPropagation();
+        if (event.description) {
+            this.setState({
+                eventDetails: event,
+            })
+        } else {
+            this.handleNavigate(e, event.event_url)
         }
     }
 
@@ -245,6 +273,13 @@ class App extends React.Component {
         event.stopPropagation();
         this.setState({
             eventToRegister: undefined,
+        })
+    }
+
+    closeEventDetails(event) {
+        event.stopPropagation();
+        this.setState({
+            eventDetails: undefined,
         })
     }
 
@@ -299,17 +334,19 @@ class App extends React.Component {
     }
 
     render() {
-        const { event_types, events, showFilter, filters } = this.state;
+        const { event_types, events, showFilter, filters, ical_link } = this.state;
         let currentMonth = "";
 
         return (
             <div className='civi-react-events'>
+                <a className='civi-react-events-ical' href={ical_link}><img src={calendar}/><img className='civi-react-events-ical-link' src={link}/> Copy this link to subscribe to this calendar</a>
                 {this.state.participantsList ? <ParticipantsModal closeModal={this.closeParticipantsModal} participants={this.state.participantsList} /> : ''}
                 {this.state.eventToRegister ? <RegistrationModal
                     event={this.state.eventToRegister}
                     closeModal={this.closeRegistrationModal}
                     register={this.registerForEvent}
                 /> : ''}
+                {this.state.eventDetails ? <EventDetailsModal closeModal={this.closeEventDetails} event={this.state.eventDetails}/> : '' }
                 {filters && <div className={`civi-react-events-filter-block`}>
                     <div className={`civi-react-events-button right`} onClick={() => this.setState({ showFilter: !showFilter })}>
                         {showFilter ? 'Hide Filters' : 'Show Filters'}
@@ -378,11 +415,10 @@ class App extends React.Component {
                                 {isFirstMonth &&
                                     <h3>{currentMonth}</h3>
                                 }
-                                {/* <a href={event.event_url}> */}
                                 <div index={index}
                                     type={event['event_type_id:label']}
                                     className="civi-react-events-event"
-                                    onClick={(e) => this.handleNavigate(e, event.event_url)}
+                                    onClick={(e) => this.showDetailsClickHandler(e, event)}
                                 >
                                     <Calendar
                                         startDate={start_date}
@@ -397,7 +433,7 @@ class App extends React.Component {
                                                 <img src={peopleGroup} onClick={(e) => this.showEventParticipants(e, event.id)} />
                                             }
                                             {event.is_registered &&
-                                                    <img fill="#b30000" src={trashCan} onClick={(e) => this.deregisterFromEvent(e, event.id)} />
+                                                    <img src={trashCan} onClick={(e) => this.deregisterFromEvent(e, event.id)} />
                                             }
                                         </div>
                                         <div className='civi-react-events-title'>
@@ -413,7 +449,6 @@ class App extends React.Component {
 
                                     </div>
                                 </div>
-                                {/* </a> */}
                             </>
                         )
                     }
