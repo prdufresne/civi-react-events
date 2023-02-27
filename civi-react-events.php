@@ -218,6 +218,7 @@ function event_register($event_id, $role = 'Attendee') {
     $user_status = user_status();
     $result = null;
     $event_id = intval($event_id);
+    $did_register = false;
 
     if($user_status['is_member']) {
         $is_registered = \Civi\Api4\Participant::get(FALSE)
@@ -234,14 +235,28 @@ function event_register($event_id, $role = 'Attendee') {
                     $role,
                 ])
                 ->execute();
+                $did_register = true;
         } elseif ($is_registered[0]['status_id:label'] == 'Cancelled') {
             $results = \Civi\Api4\Participant::update()
                 ->addValue('status_id:label', 'Registered')
                 ->addWhere('id', '=', $is_registered[0]['id'])
                 ->execute();
+                $did_register = true;
         } else {
             $result = "Oh no, Mr Bill!";
         }
+
+        if($did_register) {
+            CRM_Activity_BAO_Activity::sendMessage(
+                "Eastern Ontario Trail Blazers <admin@eotb.ca>",
+                1,
+                $user_status['contact_id'],
+                "Event Registration",
+                "",
+                "<h2>Event Details</h2>",
+            )
+        }
+
     } else {
         $result = array(
             'role' => $role,
