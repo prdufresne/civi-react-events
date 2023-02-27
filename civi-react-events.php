@@ -225,9 +225,10 @@ function event_register($event_id, $role = 'Attendee') {
             ->addSelect('id', 'status_id:label')
             ->addWhere('event_id', '=', $event_id)
             ->addWhere('contact_id', '=', 'user_contact_id')
-            ->execute();
+            ->execute()
+            ->first();
 
-        if(count($is_registered) == 0 ) {
+        if($is_registered == null ) {
             $result = \Civi\Api4\Participant::create(FALSE)
                 ->addValue('contact_id', 'user_contact_id')
                 ->addValue('event_id', $event_id)
@@ -236,10 +237,10 @@ function event_register($event_id, $role = 'Attendee') {
                 ])
                 ->execute();
             $did_register = true;
-        } elseif ($is_registered[0]['status_id:label'] == 'Cancelled') {
+        } elseif ($is_registered['status_id:label'] == 'Cancelled') {
             $results = \Civi\Api4\Participant::update()
                 ->addValue('status_id:label', 'Registered')
-                ->addWhere('id', '=', $is_registered[0]['id'])
+                ->addWhere('id', '=', $is_registered['id'])
                 ->execute();
             $did_register = true;
         } else {
@@ -247,6 +248,12 @@ function event_register($event_id, $role = 'Attendee') {
         }
 
         if($did_register) {
+            $event = \Civi\Api4\Event::get(FALSE)
+                ->addSelect('title', 'description')
+                ->addWhere('id', '=', $event_id)
+                ->execute()
+                ->first();
+
             CRM_Activity_BAO_Activity::sendMessage(
                 "Eastern Ontario Trail Blazers <admin@eotb.ca>",
                 1,
