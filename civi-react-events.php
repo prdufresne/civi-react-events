@@ -254,14 +254,22 @@ function event_register($event_id, $role = 'Attendee') {
                 ->execute()
                 ->first();
 
-            CRM_Activity_BAO_Activity::sendMessage(
-                "Eastern Ontario Trail Blazers <admin@eotb.ca>",
-                1,
-                $user_status['contact_id'],
-                "Event Registration",
-                "",
-                "<h2>Event Details</h2>",
+            $user_details = \Civi\Api4\Contact::get(FALSE)
+                ->addSelect('display_name', '(email_primary.email) AS email')
+                ->addWhere('id', '=', 'user_contact_id')
+                ->execute()
+                ->first();
+
+            $mail_parameters = array(
+                'from' => "Eastern Ontario Trail Blazers <admin@eotb.ca>",
+                'toName' => $user_details['display_name'],
+                'toEmail' => $user_details['email'],
+                'subject' => "Event Registration " . $event['title'],
+                'html' => $event['description'],
             );
+
+            $email_sent = \CRM_Utils_Mail::send($mail_parameters);
+
         }
 
     } else {
