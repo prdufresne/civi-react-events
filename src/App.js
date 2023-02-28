@@ -50,6 +50,7 @@ function ParticipantsModal(props) {
                         )}
                     </tbody>
                 </table>
+                <div className={`civi-react-events-button`} onClick={props.closeModal}>Close</div>
             </div>
         </div>
     )
@@ -80,6 +81,7 @@ function EventDetailsModal(props) {
                 <div dangerouslySetInnerHTML={{
                     __html: props.event.description
                 }} />
+                <div className={`civi-react-events-button`} onClick={props.closeModal}>Close</div>
             </div>
         </div>
     )

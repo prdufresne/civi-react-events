@@ -107,6 +107,8 @@ function participant_list($event_id) {
     $participants = \Civi\Api4\Participant::get(FALSE)
     ->addSelect('(contact_id.display_name) AS name', 'role_id:label', 'status_id:label')
     ->addWhere('event_id', '=', $event_id)
+    ->addOrderBy('status_id', 'ASC')    // Show registered first, cancelled last
+    ->addOrderBy('role_id', 'DESC')     // Show Trail Leaders first
     ->addOrderBy('contact_id.last_name', 'ASC')
     ->addOrderBy('contact_id.first_name', 'ASC')
     ->execute();
@@ -223,6 +225,10 @@ function event_register($event_id, $role = 'Attendee') {
     $event_id = intval($event_id);
     $did_register = false;
 
+    if($user_status['is_trail_leader']) {
+        $role = 'Trail Leader';
+    }
+
     if($user_status['is_member']) {
         $is_registered = \Civi\Api4\Participant::get(FALSE)
             ->addSelect('id', 'status_id:label')
@@ -243,6 +249,9 @@ function event_register($event_id, $role = 'Attendee') {
         } elseif ($is_registered['status_id:label'] == 'Cancelled') {
             $results = \Civi\Api4\Participant::update()
                 ->addValue('status_id:label', 'Registered')
+                ->addValue('role_id:label', [
+                    $role,
+                ])
                 ->addWhere('id', '=', $is_registered['id'])
                 ->execute();
             $did_register = true;
