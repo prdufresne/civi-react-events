@@ -76,11 +76,14 @@ function RegistrationModal(props) {
 
 function EventDetailsModal(props) {
     return (
+        
         <div className={`civi-react-events-modal`} onClick={props.closeModal}>
             <div className='civi-react-events-modal-content'>
-                <div dangerouslySetInnerHTML={{
+                <Calendar startDate={props.event.start_date} endDate={props.event.end_date} />
+                <div style={{clear: 'both'}} dangerouslySetInnerHTML={{
                     __html: props.event.description
                 }} />
+                <br/>
                 <div className={`civi-react-events-button`} onClick={props.closeModal}>Close</div>
             </div>
         </div>
