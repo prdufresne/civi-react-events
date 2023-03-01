@@ -78,12 +78,11 @@ function RegistrationModal(props) {
 
 function EventDetailsModal(props) {
 
+    // If the first element in the description is an image, make the calendar overlay the image.
     const regex = /^<(\w+)><img.*><\/\1>/g;
-
     const dateModifier = regex.test(props.event.description) ? 'overlay' : '';
 
-    return (
-        
+    return (    
         <div className={`civi-react-events-modal`} onClick={props.closeModal}>
             <div className='civi-react-events-modal-content' type={props.event['event_type_id:label']}>
                 <Calendar subClass={dateModifier} startDate={props.event.start_date} endDate={props.event.end_date} />
