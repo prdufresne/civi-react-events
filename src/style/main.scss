@@ -58,6 +58,11 @@
     box-shadow: 3px 3px #aaa;
   }
 
+  .civi-react-events-cell-date.overlay {
+    position: absolute;
+    box-shadow: 3px 3px rgb(80 80 80 / 75%);
+  }
+
   .civi-react-events-weekday {
     text-align: center;
     font-size: .8em;
@@ -155,7 +160,8 @@
 		border-bottom: solid 5px #b30000;
   }
 
-  .civi-react-events-event[type="Member-Run"] .civi-react-events-weekday {
+  .civi-react-events-event[type="Member-Run"] .civi-react-events-weekday,
+  .civi-react-events-modal-content[type="Member-Run"] .civi-react-events-weekday {
 		color: #fff;
 		background-color: #b30000;
   }

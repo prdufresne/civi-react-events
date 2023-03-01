@@ -85,7 +85,7 @@ function EventDetailsModal(props) {
     return (
         
         <div className={`civi-react-events-modal`} onClick={props.closeModal}>
-            <div className='civi-react-events-modal-content'>
+            <div className='civi-react-events-modal-content' type={props.event['event_type_id:label']}>
                 <Calendar subClass={dateModifier} startDate={props.event.start_date} endDate={props.event.end_date} />
                 <div style={{clear: 'both'}} dangerouslySetInnerHTML={{
                     __html: props.event.description
