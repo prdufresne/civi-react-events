@@ -8,9 +8,11 @@ import calendarLink from './icons/calendar-link.svg';
 function Calendar(props) {
     const { startDate, endDate } = props;
 
+    const subClass = props.subClass ? " " + props.subClass : '';
+
     let weekdayString = startDate.weekday;
     let dayString = startDate.day;
-    let style = "";
+    let style = ""; 
 
     if (endDate && startDate.date != endDate.date) {
         weekdayString = `${startDate.weekday.substring(0, 3)}-${endDate.weekday.substring(0, 3)}`
@@ -19,9 +21,9 @@ function Calendar(props) {
     }
 
     return (
-        <div class="civi-react-events-cell-date">
-            <div class="civi-react-events-weekday">{weekdayString}</div>
-            <div class={"civi-react-events-day" + style}>{dayString}</div>
+        <div className={"civi-react-events-cell-date" + subClass}>
+            <div className="civi-react-events-weekday">{weekdayString}</div>
+            <div className={"civi-react-events-day" + style}>{dayString}</div>
         </div>
     )
 }
@@ -75,11 +77,16 @@ function RegistrationModal(props) {
 }
 
 function EventDetailsModal(props) {
+
+    const regex = /^<(\w+)><img.*><\/\1>/g;
+
+    const dateModifier = regex.test(props.event.description) ? 'overlay' : '';
+
     return (
         
         <div className={`civi-react-events-modal`} onClick={props.closeModal}>
             <div className='civi-react-events-modal-content'>
-                <Calendar startDate={props.event.start_date} endDate={props.event.end_date} />
+                <Calendar subClass={dateModifier} startDate={props.event.start_date} endDate={props.event.end_date} />
                 <div style={{clear: 'both'}} dangerouslySetInnerHTML={{
                     __html: props.event.description
                 }} />
