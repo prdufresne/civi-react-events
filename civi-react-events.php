@@ -201,6 +201,7 @@ function event_list() {
         $events[$index]['start_date'] = parse_date($event['start_date']);
         $events[$index]['end_date'] = parse_date($event['end_date']);
         $events[$index]['is_full'] = $event['is_online_registration']  && ($event['participants'][0]['count'] >= $event['max_participants']);
+        $events[$index]['style'] = str_replace(' ', '-', $event['event_type_id:label']);
         $index++;
     }
 

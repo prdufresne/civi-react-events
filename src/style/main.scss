@@ -156,42 +156,42 @@
     color: white;
   }
 
-  .civi-react-events-event[type="Member-Run"] {
+  .civi-react-events-event#Member-Run {
 		border-bottom: solid 5px #b30000;
   }
 
-  .civi-react-events-event[type="Member-Run"] .civi-react-events-weekday,
-  .civi-react-events-modal-content[type="Member-Run"] .civi-react-events-weekday {
+  .civi-react-events-event#Member-Run .civi-react-events-weekday,
+  .civi-react-events-modal-content#Member-Run .civi-react-events-weekday {
 		color: #fff;
 		background-color: #b30000;
   }
   
-  .civi-react-events-event[type="Open-Run"] {
+  .civi-react-events-event#Open-Run {
 		border-bottom: solid 5px #048004;
   }
 
-  .civi-react-events-event[type="Open-Run"] .civi-react-events-weekday,
-  .civi-react-events-modal-content[type="Open-Run"] .civi-react-events-weekday {
+  .civi-react-events-event#Open-Run .civi-react-events-weekday,
+  .civi-react-events-modal-content#Open-Run .civi-react-events-weekday {
 		color: #fff;
 		background-color: #048004;
   }
 
-  .civi-react-events-event[type="Wing-Night"] {
+  .civi-react-events-event#Wing-Night {
 		border-bottom: solid 5px #0059b3;
 }
 
-  .civi-react-events-event[type="Wing-Night"] .civi-react-events-weekday,
-  .civi-react-events-modal-content[type="Wing-Night"] .civi-react-events-weekday {
+  .civi-react-events-event#Wing-Night .civi-react-events-weekday,
+  .civi-react-events-modal-content#Wing-Night .civi-react-events-weekday {
 		color: #fff;
 		background-color: #0059b3;
 }
 
-  .civi-react-events-event[type="AGM"] {
+  .civi-react-events-event#AGM {
 		border-bottom: solid 5px #b37d00;
 }
 
-  .civi-react-events-event[type="AGM"] .civi-react-events-weekday,
-  .civi-react-events-modal-content[type="AGM"] .civi-react-events-weekday {
+  .civi-react-events-event#AGM .civi-react-events-weekday,
+  .civi-react-events-modal-content#AGM .civi-react-events-weekday {
 		color: #fff;
 		background-color: #b37d00;
 }

@@ -84,7 +84,7 @@ function EventDetailsModal(props) {
 
     return (    
         <div className={`civi-react-events-modal`} onClick={props.closeModal}>
-            <div className='civi-react-events-modal-content' type={props.event['event_type_id:label']}>
+            <div className='civi-react-events-modal-content' id={props.event['style']}>
                 <Calendar subClass={dateModifier} startDate={props.event.start_date} endDate={props.event.end_date} />
                 <div style={{clear: 'both'}} dangerouslySetInnerHTML={{
                     __html: props.event.description
@@ -403,7 +403,7 @@ class App extends React.Component {
                         (!filters.applied.event_full || filters.event_full[event.is_full ? 'full' : 'available'])
                     ) {
 
-                        const eventType = event['event_type_id:label'];
+                        const eventType = event['style'];
                         const showParticipants = event.is_online_registration && (
                             (this.state.is_executive && eventType == 'AGM') ||
                             (this.state.is_trail_leader && (eventType == 'Member-Run' || eventType == 'Open-Run') )
@@ -427,8 +427,9 @@ class App extends React.Component {
                                     <h3>{currentMonth}</h3>
                                 }
                                 <div index={index}
-                                    type={event['event_type_id:label']}
+                                    id={eventType}
                                     className="civi-react-events-event"
+                                    // style={image ? {backgroundImage: `url('${image}')`} : {}}
                                     onClick={(e) => this.showDetailsClickHandler(e, event)}
                                 >
                                     <Calendar
