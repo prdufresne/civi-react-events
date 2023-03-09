@@ -258,7 +258,7 @@ class App extends React.Component {
     }
 
     registrationClickHandler(e, event) {
-
+        e.stopPropagation();
         if (this.state.is_member) {
             e.stopPropagation();
             this.setState({
