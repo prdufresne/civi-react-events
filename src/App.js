@@ -260,11 +260,11 @@ class App extends React.Component {
     registrationClickHandler(e, event) {
         e.stopPropagation();
         if (this.state.is_member) {
-            e.stopPropagation();
             this.setState({
                 eventToRegister: event,
             })
         } else {
+            console.log("event:", event)
             this.handleNavigate(event.registration_url)
         }
     }
@@ -276,7 +276,7 @@ class App extends React.Component {
                 eventDetails: event,
             })
         } else {
-            this.handleNavigate(e, event.event_url)
+            this.handleNavigate(event.event_url)
         }
     }
 
@@ -340,7 +340,7 @@ class App extends React.Component {
         return checked;
     }
 
-    handleNavigate(e,destination) {
+    handleNavigate(destination) {
         window.location.href=destination;
     }
 
