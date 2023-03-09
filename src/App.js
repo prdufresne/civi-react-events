@@ -147,20 +147,12 @@ class App extends React.Component {
     loadData() {
         const events = this.fetchEvents()
             .then((result) => {
-
-                // console.log("result:", result);
-
-                const { events, event_types, user_status, ical_link } = result;   
-                
+                const { events, event_types, user_status, ical_link } = result;              
                 const filters = this.state.filters;
-
                 event_types.forEach(event_type => {
                     if(!(event_type.value in filters.event_type))
                     filters.event_type[event_type.value] = false;
                 })
-
-
-                console.log("User status:", user_status);
 
                 this.setState({
                     events,
@@ -227,8 +219,6 @@ class App extends React.Component {
         filters[name][id.toString()] = checked;
         filters.applied[name] = this.anyChecked(filters[name]);
 
-        console.log("filters:", filters)
-
         this.setState({
             filters,
         })
@@ -242,8 +232,6 @@ class App extends React.Component {
                 filters[level1][level2] = false;
             })
         })
-
-        console.log("filters:", filters)
 
         this.setState({
             filters,
@@ -264,7 +252,6 @@ class App extends React.Component {
                 eventToRegister: event,
             })
         } else {
-            console.log("event:", event)
             this.handleNavigate(event.registration_url)
         }
     }
@@ -304,7 +291,6 @@ class App extends React.Component {
         const loadData = this.loadData;
         jQuery.post(my_ajax_object.ajax_url, queryParameters,
             function (response) {
-                console.log("Response:", response)
                 loadData();
             }
         ).fail(function (err) {
@@ -323,7 +309,6 @@ class App extends React.Component {
         const loadData = this.loadData;
         jQuery.post(my_ajax_object.ajax_url, queryParameters,
             function (response) {
-                console.log("Response:", response)
                 loadData();
             }
         ).fail(function (err) {
