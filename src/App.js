@@ -30,6 +30,11 @@ function Calendar(props) {
 
 function ParticipantsModal(props) {
 
+    console.log(props.participants);
+
+    const showVehicleEvents = ['Open-Run', 'Member-Run', 'Camping']
+    const showVehicle = showVehicleEvents.includes(props.event.style)
+
     return (
         <div className={`civi-react-events-modal`} onClick={props.closeModal}>
             <div className='civi-react-events-modal-content'>
@@ -40,15 +45,29 @@ function ParticipantsModal(props) {
                             <th>Name</th>
                             <th>Attendee Role</th>
                             <th>Status</th>
+                            {showVehicle && <th>Vehicle</th>}
                         </tr>
                     </thead>
                     <tbody>
-                        {props.participants.map((participant, index) =>
-                            <tr>
-                                <td>{participant.name}</td>
-                                <td>{participant['role_id:label'] && participant['role_id:label'].join(', ')}</td>
-                                <td>{participant['status_id:label']}</td>
-                            </tr>
+                        {props.participants.map((participant, index) => {
+
+                            const vehicleParts = [];
+                            if(participant.vehicle_year) vehicleParts.push(participant.vehicle_year);
+                            if(participant.make) vehicleParts.push(participant.make);
+                            if(participant.model) vehicleParts.push(participant.model);
+                            if(participant.license_plate) vehicleParts.push(`(${participant.license_plate})`);
+
+                            const vehicle = vehicleParts.join(" ");
+
+                            return (
+                                <tr>
+                                    <td>{participant.name}</td>
+                                    <td>{participant['role_id:label'] && participant['role_id:label'].join(', ')}</td>
+                                    <td>{participant['status_id:label']}</td>
+                                    {showVehicle && <td>{vehicle}</td>}
+                                </tr>
+                            )
+                        }
                         )}
                     </tbody>
                 </table>
@@ -184,12 +203,13 @@ class App extends React.Component {
         })
     }
 
-    showEventParticipants = (event, id) => {
-        event.stopPropagation();
-        this.fetchParticipants(id)
+    showEventParticipants = (e, event) => {
+        e.stopPropagation();
+        this.fetchParticipants(event.id)
             .then((result) => {
                 this.setState({
                     participantsList: result,
+                    participantListEvent: event,
                 })
             })
     }
@@ -335,8 +355,12 @@ class App extends React.Component {
 
         return (
             <div className='civi-react-events'>
-                <a className='civi-react-events-ical' href={ical_link}><img src={calendarLink}/>Copy this link to subscribe to this calendar</a>
-                {this.state.participantsList ? <ParticipantsModal closeModal={this.closeParticipantsModal} participants={this.state.participantsList} /> : ''}
+                <a className='civi-react-events-ical' href={ical_link}><img src={calendarLink} />Copy this link to subscribe to this calendar</a>
+                {this.state.participantsList ? <ParticipantsModal
+                    closeModal={this.closeParticipantsModal}
+                    participants={this.state.participantsList}
+                    event={this.state.participantListEvent}
+                /> : ''}
                 {this.state.eventToRegister ? <RegistrationModal
                     event={this.state.eventToRegister}
                     closeModal={this.closeRegistrationModal}
@@ -427,7 +451,7 @@ class App extends React.Component {
                                                 <div className={`civi-react-events-button`} onClick={(e) => this.registrationClickHandler(e, event)}>Register</div>
                                             }
                                             {showParticipants &&
-                                                <img src={peopleGroup} onClick={(e) => this.showEventParticipants(e, event.id)} />
+                                                <img src={peopleGroup} onClick={(e) => this.showEventParticipants(e, event)} />
                                             }
                                             {event.is_registered &&
                                                     <img src={trashCan} onClick={(e) => this.deregisterFromEvent(e, event.id)} />

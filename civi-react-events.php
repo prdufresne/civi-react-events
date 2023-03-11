@@ -106,8 +106,8 @@ function parse_date($date_string) {
 function participant_list($event_id) {
     $participants = \Civi\Api4\Participant::get(FALSE)
     ->addSelect('(contact_id.display_name) AS name', 'role_id:label', 'status_id:label',
-        '(contact_id.Vehicle.Make) as make', '(contact_id.Vehicle.Model) as model',
-        '(contact_id.Vehicle.Imported_Year) as vehicle_year', '(contact_id.Vehicle.License_Plate) as license_plate'
+        '(contact_id.Vehicle.Make) AS make', '(contact_id.Vehicle.Model) AS model',
+        '(contact_id.Vehicle.Imported_Year) AS vehicle_year', '(contact_id.Vehicle.License_Plate) AS license_plate'
     )
     ->addWhere('event_id', '=', $event_id)
     ->addOrderBy('status_id', 'ASC')    // Show registered first, cancelled last
