@@ -370,8 +370,7 @@ function simple_calendar($user_atts = [], $content = null, $tag = '') {
     $styleModifier = $atts['widget'] == 1 ? 'widget' : '';
 
     // Open calendar object
-    $Content = "<a href=\"$url\">";
-    $Content .= "<div id=\"$syleModifier\" class=\"civi-react-events\">";
+    $Content .= "<div class=\"civi-react-events\">";
 
     // Add header
     if($atts['showheader'] > 0) {
@@ -380,41 +379,21 @@ function simple_calendar($user_atts = [], $content = null, $tag = '') {
 	    $Content .= "    <h3 class=\"$headerClass\">$header</h3>";
     }
 
-    // Get events starting today or after ordered by start date
-    $eventList = \Civi\Api4\Event::get(FALSE)
-        ->addSelect('*', 'event_type_id:label', 'registration_link_text')
-        ->addOrderBy('start_date', 'ASC')
-        ->addOrderBy('end_date', 'ASC')
-        ->addWhere('start_date', '>=', date('Y-m-d'))
-        ->setLimit($atts['limit'])
-        ->execute();
-    $currentMonth = "";
-
+    $eventList = event_list();
     foreach ( $eventList as $event ) {
-        $title = $event['title'];
-        $summary = $event['summary'];
-        $typeLabel = $event['event_type_id:label'];
-        $id = $event['id'];
-        $url = \CRM_Utils_System::url( 'civicrm/event/info', "reset=1&id=$id" );
-
-        $startString = $event['start_date'];
-        $start = date_create_from_format('Y-m-d H:i:s',$startString);
-        $startMonth = date_format($start, 'F');
-        $startDay = date_format($start, 'j');
-        $startWeekday = date_format($start, 'l');
+        $startMonth = $event['start_date']['month'];
+        $startWeekday = $event['start_date']['weekday'];
 
         // Check for an end date then validate if this is a multi-day event.
-        $endString = $event['end_date'];
-        $multiday = false;
-        if($endString != null ) {
-            $end = date_create_from_format('Y-m-d H:i:s',$endString);
-            $endMonth = date_format($end, 'F');
-            $endDay = date_format($end, 'j');
-            $endWeekday = date_format($end, 'l');
+        $dateStyle = "";
+        $dayString = $event['start_date']['day'];
+        $weekdayString = $startWeekday;
 
-            $startDate = explode(" ", $startString)[0];
-            $endDate = explode(" ", $endString)[0];
-            $multiday = $startDate != $endDate;
+        if($event['end_date']['date'] != null && $event['start_date']['date'] != $event['end_date']['date']) {
+            $endWeekday = $event['end_date']['weekday'];
+            $dateStyle ="multiday";
+            $dayString .=  "-" . $event['end_date']['day'];
+            $weekdayString = substr($startWeekday, 0, 3) . "-" . substr($endWeekday, 0, 3);
         }
 
         // Insert a monthly header 
@@ -424,27 +403,16 @@ function simple_calendar($user_atts = [], $content = null, $tag = '') {
         }
 
         // Start the event row (we use a complete table for each event for formatting reasons);
-        $row = "<div class=\"civi-react-events-event $typeLabel\">";
+        $row = "<a href=\"" . $event['event_url'] . "\">";
+        $row .= "<div id=\"" . $event['style'] . "\" class=\"civi-react-events-event\">";
         
         // Add the date block
-
-        $dateStyle = "";
-        $dayString = $startDay;
-        $weekdayString = $startWeekday;
-
-        // If the start day and end day are different, this is a multi-day event.
-        if ($multiday) {
-            $dateStyle ="multiday";
-            $dayString .=  "-".$endDay;
-            $weekdayString = date_format($start, 'D')."-".date_format($end, 'D');
-        }
-
         $row .= "<div class=\"civi-react-events-cell-date\">";
         $row .= "    <div class=\"civi-react-events-weekday\">$weekdayString</div>";
         $row .= "    <div class=\"civi-react-events-day $dateStyle\">$dayString</div>";
         $row .= "</div>";
-        $row .= "<div class=\"civi-react-events-title\">$title</div>";
-        $row .= "<div class=\"civi-react-events-description\">$summary</div>";
+        $row .= "<div class=\"civi-react-events-title\">" . $event['title'] . "</div>";
+        $row .= "<div class=\"civi-react-events-description\">" . $event['summary'] . "</div>";
 
         // Close Row
 
