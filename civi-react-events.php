@@ -4,7 +4,7 @@
  * Description:       Displays CiviCRM events in WordPress using React
  * Requires at least: 5.8
  * Requires PHP:      7.0
- * Version:           0.7.1
+ * Version:           0.7.2
  * Author:            Paul Dufresne
  * License:           MI
  * License URI:       https://github.com/prdufresne/civi-react-events/blob/main/LICENSE
