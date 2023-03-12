@@ -4,7 +4,7 @@
  * Description:       Displays CiviCRM events in WordPress using React
  * Requires at least: 5.8
  * Requires PHP:      7.0
- * Version:           0.7.0
+ * Version:           0.7.1
  * Author:            Paul Dufresne
  * License:           MI
  * License URI:       https://github.com/prdufresne/civi-react-events/blob/main/LICENSE
@@ -370,7 +370,7 @@ function simple_calendar($user_atts = [], $content = null, $tag = '') {
     $styleModifier = $atts['widget'] == 1 ? 'widget' : '';
 
     // Open calendar object
-    $Content .= "<div class=\"civi-react-events\">";
+    $Content .= "<div class=\"civi-react-events $styleModifier\">";
 
     // Add header
     if($atts['showheader'] > 0) {
