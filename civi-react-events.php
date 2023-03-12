@@ -4,7 +4,7 @@
  * Description:       Displays CiviCRM events in WordPress using React
  * Requires at least: 5.8
  * Requires PHP:      7.0
- * Version:           0.4.0
+ * Version:           0.7.0
  * Author:            Paul Dufresne
  * License:           MI
  * License URI:       https://github.com/prdufresne/civi-react-events/blob/main/LICENSE
@@ -15,8 +15,17 @@ namespace CiviReactEvents;
 
 // add_action( 'admin_menu', __NAMESPACE__ . 'admin_page' );
 add_shortcode('civi-react-events', __NAMESPACE__ . '\render_shortcode');
+add_shortcode('civi-simple-calendar', __NAMESPACE__.'\simple_calendar');
 add_action( 'wp_ajax_civi_react_events', __NAMESPACE__ . '\user_action' );
 add_action( 'wp_ajax_nopriv_civi_react_events', __NAMESPACE__ . '\non_user_action' );
+
+function console_log($label, $output, $with_script_tags = true) {
+    $js_code = 'console.log("' . $label .'",' . json_encode($output, JSON_HEX_TAG) . ');';
+    if ($with_script_tags) {
+        $js_code = '<script>' . $js_code . '</script>';
+    }
+    echo $js_code;
+}
 
 /**
  * Init Admin Menu.
@@ -341,6 +350,116 @@ function render_shortcode() {
 }
 
 add_action( 'wp_enqueue_scripts', __NAMESPACE__ . '\enqueue_scripts' );
+
+function simple_calendar($user_atts = [], $content = null, $tag = '') {
+    
+	// Normalize attribute keys to lowercase
+	$user_atts = array_change_key_case( (array) $user_atts, CASE_LOWER );
+
+    //Add default attributes and override with user attributes
+    $atts = shortcode_atts(
+        array(
+            'showheader' => 1,
+            'header' => 'Upcoming Events',
+            'showical' => 1,
+            'limit' => 0,
+            'widget' => 0,
+        ), $user_atts, $tag
+    );
+
+    $styleModifier = $atts['widget'] == 1 ? 'widget' : '';
+
+    // Open calendar object
+    $Content = "<a href=\"$url\">";
+    $Content .= "<div id=\"$syleModifier\" class=\"civi-react-events\">";
+
+    // Add header
+    if($atts['showheader'] > 0) {
+        $header = $atts['header'];
+        $headerClass = $atts['widget'] == 1 ? "widget-title" : "";
+	    $Content .= "    <h3 class=\"$headerClass\">$header</h3>";
+    }
+
+    // Get events starting today or after ordered by start date
+    $eventList = \Civi\Api4\Event::get(FALSE)
+        ->addSelect('*', 'event_type_id:label', 'registration_link_text')
+        ->addOrderBy('start_date', 'ASC')
+        ->addOrderBy('end_date', 'ASC')
+        ->addWhere('start_date', '>=', date('Y-m-d'))
+        ->setLimit($atts['limit'])
+        ->execute();
+    $currentMonth = "";
+
+    foreach ( $eventList as $event ) {
+        $title = $event['title'];
+        $summary = $event['summary'];
+        $typeLabel = $event['event_type_id:label'];
+        $id = $event['id'];
+        $url = \CRM_Utils_System::url( 'civicrm/event/info', "reset=1&id=$id" );
+
+        $startString = $event['start_date'];
+        $start = date_create_from_format('Y-m-d H:i:s',$startString);
+        $startMonth = date_format($start, 'F');
+        $startDay = date_format($start, 'j');
+        $startWeekday = date_format($start, 'l');
+
+        // Check for an end date then validate if this is a multi-day event.
+        $endString = $event['end_date'];
+        $multiday = false;
+        if($endString != null ) {
+            $end = date_create_from_format('Y-m-d H:i:s',$endString);
+            $endMonth = date_format($end, 'F');
+            $endDay = date_format($end, 'j');
+            $endWeekday = date_format($end, 'l');
+
+            $startDate = explode(" ", $startString)[0];
+            $endDate = explode(" ", $endString)[0];
+            $multiday = $startDate != $endDate;
+        }
+
+        // Insert a monthly header 
+        if ($startMonth != $currentMonth) {
+            $currentMonth = $startMonth;
+            $Content .= "<h3>$startMonth</h3>";
+        }
+
+        // Start the event row (we use a complete table for each event for formatting reasons);
+        $row = "<div class=\"civi-react-events-event $typeLabel\">";
+        
+        // Add the date block
+
+        $dateStyle = "";
+        $dayString = $startDay;
+        $weekdayString = $startWeekday;
+
+        // If the start day and end day are different, this is a multi-day event.
+        if ($multiday) {
+            $dateStyle ="multiday";
+            $dayString .=  "-".$endDay;
+            $weekdayString = date_format($start, 'D')."-".date_format($end, 'D');
+        }
+
+        $row .= "<div class=\"civi-react-events-cell-date\">";
+        $row .= "    <div class=\"civi-react-events-weekday\">$weekdayString</div>";
+        $row .= "    <div class=\"civi-react-events-day $dateStyle\">$dayString</div>";
+        $row .= "</div>";
+        $row .= "<div class=\"civi-react-events-title\">$title</div>";
+        $row .= "<div class=\"civi-react-events-description\">$summary</div>";
+
+        // Close Row
+
+        $row .= "</div>";
+
+        $Content .= $row;
+    }
+
+    // Close calendar object
+
+    $Content .= "</div>";
+    $Content .= "</a>";
+
+    return $Content;
+}
 
 /**
  * Enqueue scripts and styles.
