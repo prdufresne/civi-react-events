@@ -114,7 +114,7 @@ function parse_date($date_string) {
 
 function participant_list($event_id) {
     $participants = \Civi\Api4\Participant::get(FALSE)
-    ->addSelect('(contact_id.display_name) AS name', 'role_id:label', 'status_id:label',
+    ->addSelect('(contact_id.display_name) AS name', 'role_id:label', 'status_id:label', '(contact_id.image_URL) AS image',
         '(contact_id.Vehicle.Make) AS make', '(contact_id.Vehicle.Model) AS model',
         '(contact_id.Vehicle.Imported_Year) AS vehicle_year', '(contact_id.Vehicle.License_Plate) AS license_plate'
     )
