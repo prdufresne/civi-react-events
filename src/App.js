@@ -3,6 +3,7 @@ import React from 'react';
 import peopleGroup from './icons/people-group.svg';
 import trashCan from './icons/trash-can.svg';
 import calendarLink from './icons/calendar-link.svg';
+import imageIcon from './icons/image-regular.svg';
 
 
 function Calendar(props) {
@@ -32,8 +33,8 @@ function ParticipantsModal(props) {
 
     console.log(props.participants);
 
-    const showVehicleEvents = ['Open-Run', 'Member-Run', 'Camping']
-    const showVehicle = showVehicleEvents.includes(props.event.style)
+    const showVehicleEvents = ['Open-Run', 'Member-Run', 'Camping'];
+    const showVehicle = showVehicleEvents.includes(props.event.style);
 
     return (
         <div className={`civi-react-events-modal`} onClick={props.closeModal}>
@@ -60,12 +61,29 @@ function ParticipantsModal(props) {
                             const vehicle = vehicleParts.join(" ");
 
                             return (
-                                <tr>
-                                    <td>{participant.name}</td>
-                                    <td>{participant['role_id:label'] && participant['role_id:label'].join(', ')}</td>
-                                    <td>{participant['status_id:label']}</td>
-                                    {showVehicle && <td>{vehicle}</td>}
-                                </tr>
+                                <>
+                                    <tr>
+                                        <td>{participant.name}</td>
+                                        <td>{participant['role_id:label'] && participant['role_id:label'].join(', ')}</td>
+                                        <td>{participant['status_id:label']}</td>
+
+                                        {showVehicle &&
+                                            <td>
+                                                {vehicle}
+                                                {participant.image &&
+                                                    <img className={'civi-react-events-icon'} src={imageIcon} onClick={(e) => props.showHideImage(e, index)} />
+                                                }
+                                            </td>
+                                        }
+                                    </tr>
+                                    {(props.participantImage == index) &&
+                                        <tr>
+                                            <td colSpan={4}>
+                                                <img className={'civi-react-events-participant-image'} src={participant.image} onClick={(e) => props.showHideImage(e, undefined)}/>
+                                            </td>
+                                        </tr>
+                                    }
+                                </>
                             )
                         }
                         )}
@@ -156,6 +174,7 @@ class App extends React.Component {
         this.closeRegistrationModal = this.closeRegistrationModal.bind(this);
         this.closeEventDetails = this.closeEventDetails.bind(this);
         this.registerForEvent = this.registerForEvent.bind(this);
+        this.showHideImage = this.showHideImage.bind(this);
         this.loadData = this.loadData.bind(this);
     }
 
@@ -232,6 +251,18 @@ class App extends React.Component {
         })
     }
 
+    showHideImage(e, participantImage) {
+        e.stopPropagation();
+
+        if(participantImage == this.state.participantImage) {
+            participantImage = undefined;
+        }
+
+        this.setState({
+            participantImage
+        })
+    }
+
     changeHandler(event) {
         const { name, id, checked } = event.target;
         const { filters } = this.state;
@@ -262,6 +293,7 @@ class App extends React.Component {
         event.stopPropagation();
         this.setState({
             participantsList: undefined,
+            participantImage: undefined,
         })
     }
 
@@ -358,6 +390,8 @@ class App extends React.Component {
                 <a className='civi-react-events-ical' href={ical_link}><img src={calendarLink} />Copy this link to subscribe to this calendar</a>
                 {this.state.participantsList ? <ParticipantsModal
                     closeModal={this.closeParticipantsModal}
+                    showHideImage={this.showHideImage}
+                    participantImage={this.state.participantImage}
                     participants={this.state.participantsList}
                     event={this.state.participantListEvent}
                 /> : ''}

@@ -205,9 +205,15 @@
   text-align: right;
 }
 
-.civi-react-events-actions img {
+.civi-react-events-actions img{
   width: 1.5em;
   margin-right: 5px;
+}
+
+img.civi-react-events-icon {
+  width: 1.5em;
+  margin-right: 5px;
+  float: right;
 }
 
 .civi-react-events-ical {
@@ -242,4 +248,10 @@
   max-width: 800px;
   min-width: 300px;
   background-color: #FFFFFF;
+}
+
+.civi-react-events-participant-image {
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  width: 100%;
 }
