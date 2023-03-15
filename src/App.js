@@ -59,6 +59,9 @@ function ParticipantsModal(props) {
                             if(participant.license_plate) vehicleParts.push(`(${participant.license_plate})`);
 
                             const vehicle = vehicleParts.join(" ");
+                            const hasImage = participant.image && participant.image != "0";
+
+                            console.log("participant.image:", participant.image)
 
                             return (
                                 <>
@@ -70,7 +73,7 @@ function ParticipantsModal(props) {
                                         {showVehicle &&
                                             <td>
                                                 {vehicle}
-                                                {participant.image &&
+                                                {hasImage &&
                                                     <img className={'civi-react-events-icon'} src={imageIcon} onClick={(e) => props.showHideImage(e, index)} />
                                                 }
                                             </td>
