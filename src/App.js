@@ -300,9 +300,9 @@ class App extends React.Component {
         })
     }
 
-    registrationClickHandler(e, event) {
+    registrationClickHandler(e, event, isTrailRun = false) {
         e.stopPropagation();
-        if (this.state.is_member) {
+        if (this.state.is_member && isTrailRun) {
             this.setState({
                 eventToRegister: event,
             })
@@ -450,9 +450,10 @@ class App extends React.Component {
                     ) {
 
                         const eventType = event['style'];
+                        const isTrailRun = (eventType == 'Member-Run' || eventType == 'Open-Run')
                         const showParticipants = event.is_online_registration && (
                             (this.state.is_executive && eventType == 'AGM') ||
-                            (this.state.is_trail_leader && (eventType == 'Member-Run' || eventType == 'Open-Run') )
+                            (this.state.is_trail_leader && isTrailRun )
                         )
 
                         const showRegistration = (event.is_online_registration && !event.is_full && !event.is_registered &&
@@ -485,7 +486,7 @@ class App extends React.Component {
                                     <div className="civi-react-events-content-column">
                                         <div className='civi-react-events-actions'>
                                             {showRegistration &&
-                                                <div className={`civi-react-events-button`} onClick={(e) => this.registrationClickHandler(e, event)}>Register</div>
+                                                <div className={`civi-react-events-button`} onClick={(e) => this.registrationClickHandler(e, event, isTrailRun)}>Register</div>
                                             }
                                             {showParticipants &&
                                                 <img src={peopleGroup} onClick={(e) => this.showEventParticipants(e, event)} />
