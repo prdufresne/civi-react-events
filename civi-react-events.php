@@ -222,7 +222,7 @@ function event_list($record_count = 0) {
 }
 
 function events_and_types() {
-    $ical_link = \CRM_Utils_System::url( 'civicrm/event/ical' );
+    $ical_link = \CRM_Utils_System::url( 'civicrm/event/ical', '', false, false, false, true );
 
     $result = array(
         'events' => event_list(),
@@ -370,7 +370,7 @@ function simple_calendar($user_atts = [], $content = null, $tag = '') {
     $styleModifier = $atts['widget'] == 1 ? 'widget' : '';
 
     // Open calendar object
-    $Content .= "<div class=\"civi-react-events $styleModifier\">";
+    $Content = "<div class=\"civi-react-events $styleModifier\">";
 
     // Add header
     if($atts['showheader'] > 0) {
@@ -380,6 +380,7 @@ function simple_calendar($user_atts = [], $content = null, $tag = '') {
     }
 
     $record_count = $atts['widget'] == 1 ? 4 : $atts['limit'];
+    $currentMonth = "";
 
     $eventList = event_list($record_count);
     foreach ( $eventList as $event ) {
