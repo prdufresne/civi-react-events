@@ -100,17 +100,36 @@ function ParticipantsModal(props) {
 
 function RegistrationModal(props) {
 
+    const eventType = props.event['style'];
+    const isTrailRun = (eventType == 'Member-Run' || eventType == 'Open-Run')
+
+    // We need to replicate this functionality, somewhat
+    const isMemberTrailRun = (this.state.is_member && isTrailRun)
+
+    // This is what the registration needs to do if isMemberTrailRun is not true.
+        
   
     return (
         <div className={`civi-react-events-modal`} onClick={props.closeModal}>
             <div className='civi-react-events-modal-content'>
-                <div dangerouslySetInnerHTML={{
-                    __html:
-                        `${props.event.intro_text}
+                {isMemberTrailRun ?
+                    <>
+                        <div dangerouslySetInnerHTML={{
+                            __html:
+                                `${props.event.intro_text}
                         <h3>${props.event.confirm_title}</h3>
                         ${props.event.confirm_text}`
-                }} />
-                <div className={`civi-react-events-button`} onClick={(e) => props.register(e, props.event.id)}>Register</div>
+                        }} />
+                        <div className={`civi-react-events-button`} onClick={(e) => props.register(e, props.event.id)}>Register</div>
+                        <div className={`civi-react-events-button`}>Cancel</div>
+                    </>
+                    :
+                    <>
+                        
+                        <div className={`civi-react-events-button`} onClick={(e) => props.handleNavigate(props.event.registration_url)}>Register</div>
+                        <div className={`civi-react-events-button`}>Cancel</div>
+                    </>
+                }
             </div>
         </div>
     )
@@ -130,6 +149,16 @@ function EventDetailsModal(props) {
                     __html: props.event.description
                 }} />
                 <br/>
+                {props.isMember &&
+                    <>
+                        {
+                            props.event.is_registered ?
+                                <div className={`civi-react-events-button`} onClick={e => props.closeAndDeregister(e, props.event.id)}>Unregister</div>
+                                :
+                                <div className={`civi-react-events-button`} onClick={e => props.closeAndRegister(e, props.event.id)}>Register</div>
+                        }
+                    </>
+                }
                 <div className={`civi-react-events-button`} onClick={props.closeModal}>Close</div>
             </div>
         </div>
@@ -302,13 +331,9 @@ class App extends React.Component {
 
     registrationClickHandler(e, event, isTrailRun = false) {
         e.stopPropagation();
-        if (this.state.is_member && isTrailRun) {
-            this.setState({
-                eventToRegister: event,
-            })
-        } else {
-            this.handleNavigate(event.registration_url)
-        }
+        this.setState({
+            eventToRegister: event,
+        });
     }
 
     showDetailsClickHandler(e, event) {
@@ -336,7 +361,18 @@ class App extends React.Component {
         })
     }
 
+    closeAndRegister(e, eventId) {
+        this.closeEventDetails(e);
+        this.registerForEvent(e, eventId);
+    }
+
+    closeAndDeregister(e, eventId) {
+        this.closeEventDetails(e);
+        this.deregisterFromEvent(e, eventId);
+    }
+
     registerForEvent(e, id) {
+
         const queryParameters = {
             'action': 'civi_react_events',
             'request': 'register-for-event',
@@ -400,10 +436,22 @@ class App extends React.Component {
                 /> : ''}
                 {this.state.eventToRegister ? <RegistrationModal
                     event={this.state.eventToRegister}
+                    isMember={this.state.isMember}
                     closeModal={this.closeRegistrationModal}
                     register={this.registerForEvent}
+                    handleNavigate={this.handleNavigate}
                 /> : ''}
-                {this.state.eventDetails ? <EventDetailsModal closeModal={this.closeEventDetails} event={this.state.eventDetails}/> : '' }
+                {this.state.eventDetails ?
+                    <EventDetailsModal
+                        closeModal={this.closeEventDetails}
+                        closeAndRegister={this.closeAndRegister}
+                        closeAndDeregister={this.closeAndDeregister}
+                        isMember={this.state.isMember}
+                        event={this.state.eventDetails}
+                    />
+                    :
+                    ''
+                }
                 {filters && <div className={`civi-react-events-filter-block`}>
                     <div className={`civi-react-events-button right`} onClick={() => this.setState({ showFilter: !showFilter })}>
                         {showFilter ? 'Hide Filters' : 'Show Filters'}
