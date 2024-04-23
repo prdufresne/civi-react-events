@@ -453,7 +453,7 @@ class App extends React.Component {
                         const isTrailRun = (eventType == 'Member-Run' || eventType == 'Open-Run')
                         const showParticipants = event.is_online_registration && (
                             (this.state.is_executive && eventType == 'AGM') ||
-                            (this.state.is_trail_leader && isTrailRun )
+                            (this.state.is_member && isTrailRun )
                         )
 
                         const showRegistration = (event.is_online_registration && !event.is_full && !event.is_registered &&
