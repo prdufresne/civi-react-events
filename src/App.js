@@ -52,6 +52,11 @@ function ParticipantsModal(props) {
                     <tbody>
                         {props.participants.map((participant, index) => {
 
+                            // If the participant cancelled, don't render anything.
+                            if(props.hideCancelled & participant['status_id:label'] == "Cancelled") {
+                                return (<></>)
+                            }
+
                             const vehicleParts = [];
                             if(participant.vehicle_year) vehicleParts.push(participant.vehicle_year);
                             if(participant.make) vehicleParts.push(participant.make);
@@ -60,6 +65,7 @@ function ParticipantsModal(props) {
 
                             const vehicle = vehicleParts.join(" ");
                             const hasImage = participant.image && participant.image != "0";
+
 
                             console.log("participant.image:", participant.image)
 
@@ -92,6 +98,7 @@ function ParticipantsModal(props) {
                         )}
                     </tbody>
                 </table>
+                <p onClick={props.showCancelled}>Show cancelled participants</p>
                 <div className={`civi-react-events-button`} onClick={props.closeModal}>Close</div>
             </div>
         </div>
@@ -198,6 +205,7 @@ class App extends React.Component {
             participantsList: undefined,
             eventToRegister: undefined,
             eventDetails: undefined,
+            hideCancelled: true,
         };
 
         this.changeHandler = this.changeHandler.bind(this);
@@ -261,6 +269,7 @@ class App extends React.Component {
                 this.setState({
                     participantsList: result,
                     participantListEvent: event,
+                    hideCancelled: true,
                 })
             })
     }
@@ -292,6 +301,12 @@ class App extends React.Component {
 
         this.setState({
             participantImage
+        })
+    }
+
+    showCancelled(event) {
+        this.setState({
+            hideCancelled: false
         })
     }
 
@@ -430,6 +445,8 @@ class App extends React.Component {
                 {this.state.participantsList ? <ParticipantsModal
                     closeModal={this.closeParticipantsModal}
                     showHideImage={this.showHideImage}
+                    showCancelled={this.showCancelled}
+                    hideCancelled={this.state.hideCancelled}
                     participantImage={this.state.participantImage}
                     participants={this.state.participantsList}
                     event={this.state.participantListEvent}
