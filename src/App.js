@@ -71,7 +71,7 @@ function ParticipantsModal(props) {
 
                             return (
                                 <>
-                                    <tr>
+                                    <tr className={participant['status_id:label']}>
                                         <td>{participant.name}</td>
                                         <td>{participant['role_id:label'] && participant['role_id:label'].join(', ')}</td>
                                         <td>{participant['status_id:label']}</td>

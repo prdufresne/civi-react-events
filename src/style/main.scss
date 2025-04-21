@@ -255,3 +255,7 @@ img.civi-react-events-icon {
   object-fit: cover;
   width: 100%;
 }
+
+.civi-react-events tr.Cancelled {
+  background-color: #ffbdb3;
+}
